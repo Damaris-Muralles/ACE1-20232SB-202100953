@@ -336,34 +336,129 @@ delay macro tiempo
         pop ax
 endm
 
-; imprimir tablero de 7*6 con diseño y a cada columna nombrarla con una letra
-imprimirtablero macro datos,valor,valor1
- LOCAL mostrar_letras
-    clear
-    ;establecer si como vacio
-    mov si, 0
-    ; Muestra las letras de columna una por una
-    mov cx, 7               ; Número de columnas
-    mov si, offset datos ; Dirección de la cadena de letras de columna
-
-    mostrar_letras:
-        mov dl, valor              ;simbolo1
-        mov ah, 2               ; Función para mostrar un carácter en pantalla
-        int 21h                 ; Muestra el espacio
-        mov dl, valor1              ; simbolo2
-        mov ah, 2               ; Función para mostrar un carácter en pantalla
-        int 21h                 ; Muestra el espacio
-        mov dl, [si]        ; Carga la letra de columna actual en dl
-        mov ah, 2            ; Función para mostrar un carácter en pantalla
-        int 21h              ; Muestra la letra en pantalla
-        inc si               ; Avanza al siguiente carácter
-        mov dl, valor1              ; simbolo2
-        mov ah, 2               ; Función para mostrar un carácter en pantalla
-        int 21h                 ; Muestra el espacio
-        loop mostrar_letras
-
-    mov dl, 13              ; '\r' - retorno de carro
+imprimircelda macro dato,valor,valor1
+   
+    mov dl, valor               ;simbolo1
     mov ah, 2               ; Función para mostrar un carácter en pantalla
-    int 21h                 ; Muestra el retorno de carro
+    int 21h                 ; Muestra el espacio
+    mov dl, valor1              ; simbolo2
+    mov ah, 2               ; Función para mostrar un carácter en pantalla
+    int 21h                 ; Muestra el espacio
+    mov dl, dato        ; Carga la letra de columna actual en dl
+    mov ah, 2            ; Función para mostrar un carácter en pantalla
+    int 21h              ; Muestra la letra en pantalla
+    inc si               ; Avanza al siguiente carácter
+    mov dl, valor1              ; simbolo2
+    mov ah, 2               ; Función para mostrar un carácter en pantalla
+    int 21h                 ; Muestra el espacio
+    
+endm
+
+verificar_ganador macro ganajugador1,ganajugador2,celda1,celda2,celda3,celda41
+    LOCAL ganador1,ganador2,empate,empate1,fin,valores
+    ganador1:
+        mov al,celda1
+        cmp al,88
+        jne ganador2
+        mov al,celda2
+        cmp al,88
+        jne ganador2
+        mov al,celda3
+        cmp al,88
+        jne ganador2
+        mov al,celda41
+        cmp al,88
+        jne ganador2
+        mov al,'G'
+        mov ganajugador1,al
+        jmp ganador2
+    ganador2:
+        mov al,celda1
+        cmp al,79
+        jne empate
+        mov al,celda2
+        cmp al,79
+        jne empate
+        mov al,celda3
+        cmp al,79
+        jne empate
+        mov al,celda41
+        cmp al,79
+        jne empate
+        mov al,'G'
+        mov ganajugador2,al
+        jmp fin
+
+    empate:
+        cmp ganajugador1,' '
+        je empate1
+        jne fin
+    empate1:
+        cmp ganajugador2,' '
+        je valores
+        jne fin
+    
+    valores:
+        mov al,'E'
+        mov ganajugador1, al
+        mov ganajugador2,al
+    fin:
+        ; nada  
 
 endm
+
+columnavacia macro vacio,celda,valor
+    LOCAL vacia1,fin
+    xor di,di
+    mov al,celda
+    cmp al,' '
+    je vacia1
+    mov al,' '
+    mov vacio,al
+    jmp fin
+    vacia1:
+        mov al,valor
+        mov vacio,al
+        mov celda,al
+    fin:
+        ; nada
+endm
+
+; generar numero random de 0 a 7
+generarrandom macro letras
+    LOCAL fin
+    
+    ; Inicializar el generador de números aleatorios
+    mov ah, 2ch
+    int 21h
+    mov ah, 2
+    int 21h
+
+    ; Generar un número aleatorio entre 0 y 6
+    mov ah, 0
+    mov al, DL
+    and al, 7
+    cmp al, 0
+    je fin
+    cmp al, 1
+    je fin
+    cmp al, 2
+    je fin
+    cmp al, 3
+    je fin
+    cmp al, 4
+    je fin
+    cmp al, 5   
+    je fin
+    cmp al, 6
+    je fin
+    
+
+    fin:
+        ; Usar el número aleatorio como índice para seleccionar una letra
+        mov bx, offset letras
+        add bx, ax
+        mov al, [bx]
+ 
+endm
+
