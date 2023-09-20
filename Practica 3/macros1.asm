@@ -1,23 +1,24 @@
-print macro cadena ;imprimir cadenas
+;imprimir cadenas en consola
+print macro cadena 
     mov ah,09h ;Numero de funcion para imprimir cadena en pantalla
 	mov dx, @data ;con esto le decimos que nuestrfo dato se encuentra en la sección data
 	mov ds,dx ;el ds debe apuntar al segmento donde se encuentra la cadena (osea el dx, que apunta  a data)
 	mov dx,offset cadena ;especificamos el largo de la cadena, con la instrucción offset
 	int 21h  ;ejecutamos la interrupción
 endm 
-
-close macro  ;cerrar el programa
+;cerrar el programa
+close macro  
     mov ah, 4ch ;Numero de función que finaliza el programa
     xor al,al ;limpiar al 
     int 21h
 endm
-
-getChar macro ;obtener caracter
+;obtener caracter
+getChar macro 
     mov ah,01h ;se guarda en al en código hexadecimal del caracter leído 
     int 21h
 endm
-
-ObtenerTexto macro cadena ;macro para recibir una cadena, varios caracteres 
+;macro para recibir una cadena, varios caracteres
+ObtenerTexto macro cadena  
 
  LOCAL ObtenerChar, endTexto 
     ;si, cx, di  registros que usualmente se usan como contadores 
@@ -36,7 +37,8 @@ ObtenerTexto macro cadena ;macro para recibir una cadena, varios caracteres
         mov cadena[di],al  ;copiamos el $ a la cadena
 endm 
 
-clear macro ;limpia pantalla
+;limpiar pantalla
+clear macro 
          print skip
          print skip
          print skip
@@ -63,6 +65,123 @@ clear macro ;limpia pantalla
          print skip
 
 endm
+
+; concatenar cadenas de texto
+concatenarCadena macro origen,destino
+    ;xor si,si  ; => mov si, 0  reinica el contador
+    LOCAL ObtenerCaracter,  termino
+    ;Limpiamos el indice si y di 
+    mov si,0
+    mov di,0
+    ;Extraemos de la pila el valor y lo guardamos en si
+    pop si
+
+    ;En base a la cadena que queremos guardar extraemos caracter por caracter
+    ;Y lo guardamos en el destino
+    ;Esto es como realizar un += para que podamos concatenar cadenas
+    ObtenerCaracter:
+        cmp origen[di], 36
+        je termino
+        mov al, origen[di]
+        mov destino[si], al
+        inc si
+        inc di
+        jmp ObtenerCaracter 
+    termino:
+        ;Como ya termino guardamos el indice si en la pila
+        push si
+        ;Limpiamos el registro di (Les recomiendo si ya no utilizan un registro limpienlo).
+        mov di,0
+
+endm
+
+; macro para hacer una pausa de n*55ms
+delay macro tiempo
+    LOCAL espera
+    ; Guardar los registros
+    push ax
+    push dx
+
+    ; Obtener el contador de ticks actual
+    mov ah, 0
+    int 1Ah
+    mov bx, dx
+
+    ; Esperar 9 ticks (aproximadamente medio segundo)
+    add bx, tiempo
+
+    espera:
+        ; Obtener el contador de ticks actual
+        mov ah, 0
+        int 1Ah
+
+        ; Comprobar si han pasado 9 ticks
+        cmp dx, bx
+        jb espera
+
+        ; Restaurar los registros
+        pop dx
+        pop ax
+endm
+; generar numero random de 0 a 7
+generarrandom macro letras
+    LOCAL fin
+    
+    ; Inicializar el generador de números aleatorios
+    mov ah, 2ch
+    int 21h
+    mov ah, 2
+    int 21h
+
+    ; Generar un número aleatorio entre 0 y 6
+    mov ah, 0
+    mov al, DL
+    and al, 7
+    cmp al, 0
+    je fin
+    cmp al, 1
+    je fin
+    cmp al, 2
+    je fin
+    cmp al, 3
+    je fin
+    cmp al, 4
+    je fin
+    cmp al, 5   
+    je fin
+    cmp al, 6
+    je fin
+
+    fin:
+        ; Usar el número aleatorio como índice para seleccionar una letra
+        mov bx, offset letras
+        add bx, ax
+        mov al, [bx]
+ 
+endm
+; obtener una cadena que contine un nombre pero sin la extension
+Obtenernombre macro cadena 
+
+ LOCAL ObtenerChar, endTexto 
+    ;si, cx, di  registros que usualmente se usan como contadores 
+    xor di,di  ; => mov si, 0  reinica el contador
+
+    ObtenerChar:
+        getChar  ;llamamos al método de obtener caracter 
+        cmp al, 0dh ; como se guarda en al, comparo si al es igual a salto de línea, ascii de salto de linea en hexadecimal o 10en ascii
+        je endTexto ;si es igual que el salto de línea, nos vamos a la etiqueta endTexto, donde agregamos el $ de dolar a la entrada 
+        cmp al, 46 ; comparamos si es punto
+        je error4
+        mov cadena[di],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc di ; => si = si+1
+        jmp ObtenerChar
+
+    endTexto:
+        mov al, 36 ;ascii del signo $ o en hexadecimal 24h
+        mov cadena[di],al  ;copiamos el $ a la cadena
+endm 
+
+
 
 ;Operaciones aritmeticas
 
@@ -110,7 +229,6 @@ sumar macro  numero1,numero2,resultado,test1,test2,signo3
         fin:
     
 endm
-
 
 imprimirDecimal macro numero,guardar
     mov al, numero     
@@ -183,35 +301,7 @@ extractorCompleto macro arreglo,numero1,numero2,test1,signo
             
 endm
 
-concatenarCadena macro origen,destino,indiceEscritura
-    ;xor si,si  ; => mov si, 0  reinica el contador
-    LOCAL ObtenerCaracter,  termino
-    ;Limpiamos el indice si y di 
-    mov si,0
-    mov di,0
-    ;Extraemos de la pila el valor y lo guardamos en si
-    pop si
-
-    ;En base a la cadena que queremos guardar extraemos caracter por caracter
-    ;Y lo guardamos en el destino
-    ;Esto es como realizar un += para que podamos concatenar cadenas
-    ObtenerCaracter:
-        cmp origen[di], 36
-        je termino
-        mov al, origen[di]
-        mov destino[si], al
-        inc si
-        inc di
-        jmp ObtenerCaracter 
-    termino:
-        ;Como ya termino guardamos el indice si en la pila
-        push si
-        ;Limpiamos el registro di (Les recomiendo si ya no utilizan un registro limpienlo).
-        mov di,0
-
-endm
-
-
+; macros para manejos de archivos
  ;La utilizamos para limpiar alguna variables con cierto caracter que se envie
 limpiar macro buffer, numbytes, caracter
   LOCAL Repetir
@@ -237,7 +327,8 @@ cerrar macro handler
 	mov ah,3eh
 	mov bx, handler
 	int 21h
-	jc Error2
+	;jc Error2
+    jc error9
 	mov handler,ax
 
 endm
@@ -253,7 +344,8 @@ crear macro buffer, handler
 	mov cx,00h
 	lea dx,buffer
 	int 21h
-	jc Error4
+	;jc Error4
+    jc error5
 	mov handler, ax
 
 
@@ -273,7 +365,8 @@ escribir macro handler, buffer, numbytes
 	mov cx, numbytes
 	lea dx, buffer
 	int 21h
-	jc Error3
+	;jc Error3
+    jc error8
 
 endm
 
@@ -284,10 +377,12 @@ abrir macro buffer,handler
 	mov al,02h
 	lea dx,buffer
 	int 21h
-	jc Error1
+	;jc Error1
+    jc error7
 	mov handler,ax
 
 endm
+
 
 ;Interrupcion para leer archivos
 leer macro handler,buffer, numbytes
@@ -302,40 +397,21 @@ leer macro handler,buffer, numbytes
 	mov cx,numbytes
 	lea dx,buffer ; mov dx,offset buffer 
 	int 21h
-	jc  Error5
+	;jc  Error5
+    jc error6
 
 endm
 
 
 
-delay macro tiempo
-    LOCAL espera
-    ; Guardar los registros
-    push ax
-    push dx
 
-    ; Obtener el contador de ticks actual
-    mov ah, 0
-    int 1Ah
-    mov bx, dx
 
-    ; Esperar 9 ticks (aproximadamente medio segundo)
-    add bx, tiempo
 
-    espera:
-        ; Obtener el contador de ticks actual
-        mov ah, 0
-        int 1Ah
 
-        ; Comprobar si han pasado 9 ticks
-        cmp dx, bx
-        jb espera
 
-        ; Restaurar los registros
-        pop dx
-        pop ax
-endm
 
+
+; macros para juego connect
 imprimircelda macro dato,valor,valor1
    
     mov dl, valor               ;simbolo1
@@ -423,42 +499,3 @@ columnavacia macro vacio,celda,valor
     fin:
         ; nada
 endm
-
-; generar numero random de 0 a 7
-generarrandom macro letras
-    LOCAL fin
-    
-    ; Inicializar el generador de números aleatorios
-    mov ah, 2ch
-    int 21h
-    mov ah, 2
-    int 21h
-
-    ; Generar un número aleatorio entre 0 y 6
-    mov ah, 0
-    mov al, DL
-    and al, 7
-    cmp al, 0
-    je fin
-    cmp al, 1
-    je fin
-    cmp al, 2
-    je fin
-    cmp al, 3
-    je fin
-    cmp al, 4
-    je fin
-    cmp al, 5   
-    je fin
-    cmp al, 6
-    je fin
-    
-
-    fin:
-        ; Usar el número aleatorio como índice para seleccionar una letra
-        mov bx, offset letras
-        add bx, ax
-        mov al, [bx]
- 
-endm
-
