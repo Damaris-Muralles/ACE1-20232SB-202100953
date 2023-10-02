@@ -12,7 +12,6 @@ include macros1.asm
 ; ================================ VARIABLES EXTRA PARA EL JUEGO ================================
 ;Salto de linea mas espacio
 skip db 0ah,0dh, ' ', '$'
-
 ;Salto de linea
 saltolinea db 10,'$'
 
@@ -69,23 +68,24 @@ mensajeOpcion db 0ah,0dh, '  --> Ingrese una opcion: ','$'
 mensajeIngresonum db 0ah,0dh, '  --> Ingrese un numero: ','$'
 mensajeOp db 0ah,0dh, '  --> Ingrese un operador: ','$'
 mensajeOperacion db 0ah,0dh, '  --> Ingrese un operador o "=" para finalizar: ','$'
-mensajeGuardar db 0ah,0dh, '  --> Desea guardar (S/N): ','$'
+mensajeGuardar db 0ah,0dh, '  --> Desea guardar (s/n): ','$'
 
 
 ; ======================================== MENSAJES SALIDAS  ========================================
 mensajeResultado db 0ah,0dh, '  --> El resultado es: ','$'
+mensajeResultado1 db 0ah,0dh, '  --> Operacion: ','$'
 ; ======================================== MENSAJES DE ERROR ========================================
 mesajeError0 db 'Solo puede presionar Enter ingresar al menu','$'
 mesajeError1 db 'Opcion invalida','$'
 mesajeError2 db 'Operador invalido','$'
 mesajeError3 db 'No puede sobrepasar los 10 operandos','$'
+mesajeError4 db 'Se llego al maximo de operaciones que se pueden guardar','$'
+mesajeError5 db 0ah,0dh, 'ERROR: Opcion invalida','$'
+mesajeError6 db 'El numero es muy grande para calcular el factorial','$'
+
 ; ======================================== VARIABLES DE CONTROL  ========================================
 ;Maneja la entrada del teclado
 handlerentrada dw ?
-
-
-;Donde se guardar las operaciones
-operaciones db 800 dup('$'), '$'
 
 ;Donde donde un simbolo 
 simbolo db 5 dup ('$'), '$'
@@ -109,14 +109,50 @@ signo2 db 5 dup('$'), '$'
 ; variables para el resultado
 resultado2 db 100 dup('$') , '$'
 signo3 db 5 dup('$'), '$'
+;Convertida
+conver db 100 dup('$') , '$'
 
 operandos db 0
-
-
-
-;Convertida
-operacionactual db 100 dup('$') , '$'
-
+operacionactual db 100 dup('$'), '$'
+; ================================ VARIABLES PARA EL FACTORIAL ================================
+numfact db 8 dup('$'), '$'
+operacionfactorial db 100 dup('$'), '$'
+simbolofactorial db '!', '$'
+simboloigual db '=', '$'
+multisimbolo db '*', '$'
+espaciosep db ' ', '$'
+; ================================ VARIABLES PARA REPORTES ================================
+id1 db 'Op1', '$'
+op1 db 200 dup('$'), '$'
+res1 db 100 dup('$'), '$'
+id2 db 'Op2', '$'
+op2 db 200 dup('$'), '$'
+res2 db 100 dup('$'), '$'
+id3 db 'Op3', '$'
+op3 db 200 dup('$'), '$'
+res3 db 100 dup('$'), '$'
+id4 db 'Op4', '$'
+op4 db 200 dup('$'), '$'
+res4 db 100 dup('$'), '$'
+id5 db 'Op5', '$'
+op5 db 200 dup('$'), '$'
+res5 db 100 dup('$'), '$'
+id6 db 'Op6', '$'
+op6 db 200 dup('$'), '$'
+res6 db 100 dup('$'), '$'
+id7 db 'Op7', '$'
+op7 db 200 dup('$'), '$'
+res7 db 100 dup('$'), '$'
+id8 db 'Op8', '$'
+op8 db 200 dup('$'), '$'
+res8 db 100 dup('$'), '$'
+id9 db 'Op9', '$'
+op9 db 200 dup('$'), '$'
+res9 db 100 dup('$'), '$'
+id10 db 'Op10', '$'
+op10 db 200 dup('$'), '$'
+res10 db 100 dup('$'), '$'
+; =============================== VARIABLES PARA EL ARCHIVO =============================== 
 ; ==================== segmento de codigo ====================
 
 .code
@@ -124,7 +160,9 @@ main proc far
 mov ax,@data
 mov ds,ax
 mov es,ax
-
+begin:
+    mov si,0
+    push si
 inicio:
     clear
     print decoinicio
@@ -152,6 +190,15 @@ inicio:
 
 menu:
     clear
+    limpiar operacionactual, SIZEOF operacionactual,'$'
+    limpiar simbolo, SIZEOF simbolo,'$'
+    limpiar numero1, SIZEOF numero1,'$'
+    limpiar numero2, SIZEOF numero2,'$'
+    limpiar conver, SIZEOF conver,'$'
+    limpiar resultado2, SIZEOF resultado2,'$'
+    limpiar operacionfactorial, SIZEOF operacionfactorial,'$'
+    mov si,0
+    push si
     mov operandos,0
     print decoinicio
     print menu1
@@ -206,19 +253,39 @@ calculadora:
     extractorCompleto numero2,num3,num4,signo2,test2
     conversor num3,resul2,num4
     inc operandos
-    print numero1
-    print simbolo
-    print numero2
     concatenarCadena numero1,operacionactual
-    print saltolinea
-    print operacionactual
+    concatenarCadena simbolo,operacionactual
+    concatenarCadena numero2,operacionactual
     ;Revisamos que operacion es
     jmp veroperacion
 
 factorial:
-    print menu8
-    delay 50
-    jmp menu
+    mov si,0
+    push si
+    mov resultado2,1
+    print saltolinea
+    print mensajeIngresonum
+    ObtenerTexto numero1
+    extractorCompleto numero1,num1,num2,signo,test1
+    conversor num1,resul,num2
+    concatenarCadena num1,operacionfactorial
+    concatenarCadena simbolofactorial,operacionfactorial
+    concatenarCadena simboloigual,operacionfactorial
+    mov al, 1
+    cmp resul,0
+    je cerofactorial
+    ConverString resultado2,conver
+    concatenarCadena conver,operacionfactorial
+    mov al, 1
+    cmp resul,1
+    je proceFactorial
+    cmp resul,2
+    je proceFactorial
+    cmp resul,3
+    je proceFactorial
+    cmp resul,4
+    je proceFactorial
+    jmp error6
 reportecalc:
     print menu9
     delay 50
@@ -229,7 +296,7 @@ salir:
     close
 
 
-; ================================ funciones para modo calculadora y factorial ===============================
+; ================================ funciones para modo calculadora ===============================
 veroperacion:
    ;Empezamos a leer cual tipo de operacion es 
     mov al,simbolo
@@ -284,7 +351,6 @@ otroOperando:
     print mensajeIngresonum
     ObtenerTexto numero2
     inc operandos
-    print numero2
     concatenarCadena simbolo,operacionactual
     concatenarCadena numero2,operacionactual
     ; extraemos el numero y lo convertimos
@@ -300,7 +366,7 @@ imprimirResultado:
     print saltolinea
     print mensajeResultado
     print signo3
-    imprimirDecimal resultado2
+    imprimirDecimal resultado2,conver
     print saltolinea
     print mensajeGuardar
     getChar
@@ -308,10 +374,144 @@ imprimirResultado:
     je guardarop
     cmp al,110 ; N
     je menu
-    jmp error1
+    jmp error5
 guardarop:
+    mov si,0
+    push si
+    cmp op1,'$'
+    je guardar1
+    cmp op2,'$'
+    je guardar2
+    cmp op3,'$'
+    je guardar3
+    cmp op4,'$'
+    je guardar4
+    cmp op5,'$'
+    je guardar5
+    cmp op6,'$'
+    je guardar6
+    cmp op7,'$'
+    je guardar7
+    cmp op8,'$'
+    je guardar8
+    cmp op9,'$'
+    je guardar9
+    cmp op10,'$'
+    je guardar10
+    jmp error4
+guardar1:
+    concatenarCadena operacionactual,op1
+    mov si,0
+    push si
+    concatenarCadena signo3,res1
+    concatenarCadena conver,res1
     print saltolinea
-    print operacionactual
+    print op1
+    print saltolinea
+    print res1
+    delay 160
+    jmp menu
+guardar2:
+    concatenarCadena operacionactual,op2
+    mov si,0
+    push si
+    concatenarCadena signo3,res2
+    concatenarCadena conver,res2
+    jmp menu
+guardar3:
+    concatenarCadena operacionactual,op3
+    mov si,0
+    push si
+    concatenarCadena signo3,res3
+    concatenarCadena conver,res3
+    jmp menu
+guardar4:
+    concatenarCadena operacionactual,op4
+    mov si,0
+    push si
+    concatenarCadena signo3,res4
+    concatenarCadena conver,res4
+    jmp menu
+guardar5:
+    concatenarCadena operacionactual,op5
+    mov si,0
+    push si
+    concatenarCadena signo3,res5
+    concatenarCadena conver,res5
+    jmp menu
+guardar6:
+    concatenarCadena operacionactual,op6
+    mov si,0
+    push si
+    concatenarCadena signo3,res6
+    concatenarCadena conver,res6
+    jmp menu
+guardar7:
+    concatenarCadena operacionactual,op7
+    mov si,0
+    push si
+    concatenarCadena signo3,res7
+    concatenarCadena conver,res7
+    jmp menu
+guardar8:
+    concatenarCadena operacionactual,op8
+    mov si,0
+    push si
+    concatenarCadena signo3,res8
+    concatenarCadena conver,res8
+    jmp menu
+guardar9:
+    concatenarCadena operacionactual,op9
+    mov si,0
+    push si
+    concatenarCadena signo3,res9
+    concatenarCadena conver,res9
+    jmp menu
+guardar10:
+    concatenarCadena operacionactual,op10
+    mov si,0
+    push si
+    concatenarCadena signo3,res10
+    concatenarCadena conver,res10
+    jmp menu
+; ================================ funciones para el factorial ===============================
+proceFactorial:
+    mov numfact,al
+    ConverString numfact,conver
+    concatenarCadena espaciosep,operacionfactorial
+    concatenarCadena conver,operacionfactorial
+    concatenarCadena simbolofactorial,operacionfactorial
+    concatenarCadena simboloigual,operacionfactorial
+    concatenarCadena conver,operacionfactorial
+    concatenarCadena multisimbolo,operacionfactorial
+    ConverString resultado2,conver
+    concatenarCadena conver,operacionfactorial
+    concatenarCadena simboloigual,operacionfactorial
+    mov al, numfact
+    factorialm al,resultado2,conver
+    concatenarCadena conver,operacionfactorial
+   
+    mov al, numfact
+    cmp al,resul
+    je terminadofactorial
+    
+    inc al
+    
+    jmp proceFactorial
+cerofactorial:
+    ConverString resultado2,conver
+    concatenarCadena conver,operacionfactorial
+    print mensajeResultado1
+    print operacionfactorial
+    print mensajeResultado
+    print conver
+    delay 150
+    jmp menu
+terminadofactorial:
+    print mensajeResultado1
+    print operacionfactorial
+    print mensajeResultado
+    print conver
     delay 150
     jmp menu
 ;=============================== errores ===============================
@@ -352,10 +552,27 @@ error3:
     delay 35
     clear
     jmp menu
-
-
-
-
+error4:
+    print Errord1
+    print Errord2
+    print mesajeError4
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+error5:
+    print mesajeError5
+    jmp imprimirResultado
+error6:
+    print Errord1
+    print Errord2
+    print mesajeError6
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
 main endp
 end main
 

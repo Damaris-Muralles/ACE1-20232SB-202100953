@@ -180,8 +180,110 @@ close macro
     int 21h
 endm
 
-;Operaciones aritmeticas
+; para limpiar datos
+limpiar macro buffer, numbytes, caracter
+  LOCAL Repetir
+    ;Limpieza de los registros
+	xor si,si
+	xor cx,cx
+    ;Cargamos el numero de repeticiones que queremos que realice loop
+	mov	cx,numbytes
 
+	Repetir:
+        ;Movemos el caracter que ingresamos en la posicion especifica de la cadena
+		mov buffer[si], caracter
+        ;Aumentamos el indice si
+		inc si
+        ;Repetimos se va a repetir en base al numero que tenga cx, en este caso lo que se ingrese
+        ;por el valor de numbytes
+		Loop Repetir
+endm
+; para archivos
+
+;Interrupcion para cerrar el handler
+cerrar macro handler
+	
+	mov ah,3eh
+	mov bx, handler
+	int 21h
+	;jc Error2
+    jc error9
+	mov handler,ax
+
+endm
+
+;Interrupccion para crear un archivo
+crear macro buffer, handler
+    xor ax,ax
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+	
+	mov ah,3ch
+	mov cx,00h
+	lea dx,buffer
+	int 21h
+	;jc Error4
+    jc error5
+	mov handler, ax
+
+
+
+endm
+
+;Interrupcion para escribir en un archivo (El handle es como el archivo abierto)
+escribir macro handler, buffer, numbytes
+    xor ax,ax
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+
+
+	mov ah, 40h
+	mov bx, handler
+	mov cx, numbytes
+	lea dx, buffer
+	int 21h
+	;jc Error3
+    jc error8
+
+endm
+
+;Interrupcion para abrir archivos
+abrir macro buffer,handler
+
+	mov ah,3dh
+	mov al,02h
+	lea dx,buffer
+	int 21h
+	;jc Error1
+    jc error7
+	mov handler,ax
+
+endm
+
+
+;Interrupcion para leer archivos
+leer macro handler,buffer, numbytes
+	xor ax,ax
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+
+
+	mov ah,3fh
+	mov bx,handler
+	mov cx,numbytes
+	lea dx,buffer ; mov dx,offset buffer 
+	int 21h
+	;jc  Error5
+    jc error6
+
+endm
+
+
+;Operaciones aritmeticas
+; Macro para la suma
 sumar macro  numero1,sign,numero2,sign1,resultado,signo3
   LOCAL salto,noSalto,fin   
      
@@ -229,7 +331,7 @@ sumar macro  numero1,sign,numero2,sign1,resultado,signo3
         fin:
     
 endm
-
+; Macro para la resta
 restar macro numero1,sign,numero2,sign1,resultado,signo3
   LOCAL salto,noSalto,fin   
      
@@ -326,6 +428,7 @@ multiplicar macro numero1,sign,numero2,sign1,resultado,signo3
         fin:
     
 endm
+; Macro para la división
 dividir macro numero1,sign,numero2,sign1,resultado,signo3
   LOCAL salto,noSalto,fin   
     mov al, numero2
@@ -372,20 +475,22 @@ dividir macro numero1,sign,numero2,sign1,resultado,signo3
         fin:
     
 endm
-imprimirDecimal macro numero
+
+imprimirDecimal macro numero,guardar
     mov al, numero     
     aam               
     add ax, 3030h     
     push ax            
     mov dl, ah         
+    mov guardar[0], dl
     mov ah, 02h        
     int 21h
     pop dx             
     mov al,dl
+    mov guardar[1], al
     mov ah, 02h        
     int 21h
 endm
-    
 conversor macro numero1,resultado,numero2
     mov al ,numero1[0]
     ;mov resultado[0], al
@@ -468,6 +573,26 @@ extractorCompleto macro arreglo,numero1,numero2,signo,test
 endm
 
 
+ConverString macro numero,convertido
+    mov al, numero     
+    aam               
+    add ax, 3030h     
+    push ax            
+    mov dl, ah         
+    mov convertido[0], dl
+    pop dx             
+    mov al,dl
+    mov convertido[1], al
+endm
+factorialm macro numero, resultado,guardar;, procedimiento,simf1,simf2,valor
+    mov al, numero
+    mov bl,al
+    xor al,al
+    mov al,resultado 
+    mul bl
+    mov resultado,al
+    ConverString resultado,guardar
+endm
 
 
 ; ================================= DE USO ESPECIFICO =================================
