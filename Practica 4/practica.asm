@@ -83,6 +83,13 @@ mesajeError4 db 'Se llego al maximo de operaciones que se pueden guardar','$'
 mesajeError5 db 0ah,0dh, 'ERROR: Opcion invalida','$'
 mesajeError6 db 'El numero es muy grande para calcular el factorial','$'
 
+mesajeError7 db  'al abrir el archivo puede que no exista' , '$'
+mesajeError8 db  'al cerrar el archivo' , '$'
+mesajeError9 db  'al escribir en el archivo' , '$'
+mesajeError10 db  'al crear en el archivo' , '$'
+mesajeError11 db 'al leer en el archivo' , '$'
+
+
 ; ======================================== VARIABLES DE CONTROL  ========================================
 ;Maneja la entrada del teclado
 handlerentrada dw ?
@@ -122,37 +129,77 @@ simboloigual db '=', '$'
 multisimbolo db '*', '$'
 espaciosep db ' ', '$'
 ; ================================ VARIABLES PARA REPORTES ================================
-id1 db 'Op1', '$'
+id1 db 'Op1: ', '$'
 op1 db 200 dup('$'), '$'
 res1 db 100 dup('$'), '$'
-id2 db 'Op2', '$'
+id2 db 'Op2: ', '$'
 op2 db 200 dup('$'), '$'
 res2 db 100 dup('$'), '$'
-id3 db 'Op3', '$'
+id3 db 'Op3: ', '$'
 op3 db 200 dup('$'), '$'
 res3 db 100 dup('$'), '$'
-id4 db 'Op4', '$'
+id4 db 'Op4: ', '$'
 op4 db 200 dup('$'), '$'
 res4 db 100 dup('$'), '$'
-id5 db 'Op5', '$'
+id5 db 'Op5: ', '$'
 op5 db 200 dup('$'), '$'
 res5 db 100 dup('$'), '$'
-id6 db 'Op6', '$'
+id6 db 'Op6: ', '$'
 op6 db 200 dup('$'), '$'
 res6 db 100 dup('$'), '$'
-id7 db 'Op7', '$'
+id7 db 'Op7: ', '$'
 op7 db 200 dup('$'), '$'
 res7 db 100 dup('$'), '$'
-id8 db 'Op8', '$'
+id8 db 'Op8: ', '$'
 op8 db 200 dup('$'), '$'
 res8 db 100 dup('$'), '$'
-id9 db 'Op9', '$'
+id9 db 'Op9: ', '$'
 op9 db 200 dup('$'), '$'
 res9 db 100 dup('$'), '$'
-id10 db 'Op10', '$'
+id10 db 'Op10: ', '$'
 op10 db 200 dup('$'), '$'
 res10 db 100 dup('$'), '$'
+; generacion de html
+html1 db 0ah,0dh, '<html>', '$'
+html2 db 0ah,0dh,'<head>', '$'
+html3 db 0ah,0dh,'<title>REPORTE</title>', '$'
+html4 db 0ah,0dh,'</head>', '$'
+html5 db 0ah,0dh,'<body>', '$'
+html6 db 0ah,0dh,'<h1>Practica 4 Arqui 1 Seccion B</h1>', '$'
+html7 db 0ah,0dh,'<h3>Estudiante: Damaris Julizza Muralles Veliz</h3>', '$'
+html8 db 0ah,0dh,'<h3>Carnet: 202100953</h3>', '$'
+html9 db 0ah,0dh,'<h3>Fecha: ', '$'
+html91 db 0ah,0dh,'<h3>Hora: ', '$'
+html10 db 0ah,0dh,'<br>', '$'
+html11 db 0ah,0dh,'<h2>Operaciones Guardadas: </h2>', '$'
+html12 db 0ah,0dh,'<br>', '$'
+html13 db 0ah,0dh,'<h3>', '$'
+html14 db '</h3>', '$'
+html15 db 0ah,0dh,'</body>', '$'
+html16 db 0ah,0dh,'</html>', '$'
+
+nombreArchivo db 'REP.html',0
+
+;Cadena que almacenada todo el reporte esta llena de espacios vacios
+reporte db 30000 dup(' '), '$'
+
+;Maneja como la interrupcion del buffer que utilizaremos para escribir
+;Datos del archivo
+rute db 'c:/masm611/bin/REP.html' ,'00h' ;ojo con el 00h es importante
+handler dw ?
+buffer db 2000 dup(' '), '$'
+
+; ================================ VARIABLES PARA FECHA Y HORA ================================
+fecha1 db 50 dup('$'), '$'
+hora1 db 50 dup('$'), '$'
+temp16 db '2023', '$'
+temp1 db 50 dup('$'), '$'
+temp2 db 50 dup('$'), '$'
+temp3 db 50 dup('$'), '$'
+simbolose db '/', '$'
+simbolopp db ':', '$'
 ; =============================== VARIABLES PARA EL ARCHIVO =============================== 
+
 ; ==================== segmento de codigo ====================
 
 .code
@@ -287,11 +334,114 @@ factorial:
     je proceFactorial
     jmp error6
 reportecalc:
-    print menu9
-    delay 50
-    jmp menu
+   
+    ObtenerFecha fecha1,conver,temp16,temp2,temp3,simbolose
+    ObtenerHora hora1,conver,temp1,temp2,temp3,simbolopp
+    mov si,0
+    push si
+    ;Concatenamos las cadenas que queremos a la del reporte
+    concatenarCadena html1,reporte
+    concatenarCadena html2,reporte
+    concatenarCadena html3,reporte
+    concatenarCadena html4,reporte
+    concatenarCadena html5,reporte
+    concatenarCadena html6,reporte
+    concatenarCadena html7,reporte
+    concatenarCadena html8,reporte
 
+    ;Obtenemos la fecha y la hora
+    concatenarCadena html9,reporte
+    concatenarCadena fecha1,reporte
+    concatenarCadena html14,reporte
+    concatenarCadena html91,reporte
+    concatenarCadena hora1,reporte
+    concatenarCadena html14,reporte
+    concatenarCadena html10,reporte
+    concatenarCadena html11,reporte
+    concatenarCadena html12,reporte
+    ;Concatenamos las operaciones que se guardaron
+    cmp op1,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id1,reporte
+    concatenarCadena op1,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res1,reporte
+    concatenarCadena html14,reporte
+    cmp op2,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id2,reporte
+    concatenarCadena op2,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res2,reporte
+    concatenarCadena html14,reporte
+    cmp op3,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id3,reporte
+    concatenarCadena op3,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res3,reporte
+    concatenarCadena html14,reporte
+    cmp op4,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id4,reporte
+    concatenarCadena op4,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res4,reporte
+    concatenarCadena html14,reporte
+    cmp op5,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id5,reporte
+    concatenarCadena op5,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res5,reporte
+    concatenarCadena html14,reporte
+    cmp op6,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id6,reporte
+    concatenarCadena op6,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res6,reporte
+    concatenarCadena html14,reporte
+    cmp op7,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id7,reporte
+    concatenarCadena op7,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res7,reporte
+    concatenarCadena html14,reporte
+    cmp op8,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id8,reporte
+    concatenarCadena op8,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res8,reporte
+    concatenarCadena html14,reporte
+    cmp op9,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id9,reporte
+    concatenarCadena op9,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res9,reporte
+    concatenarCadena html14,reporte
+    cmp op10,'$'
+    je GenerarReporte
+    concatenarCadena html13,reporte
+    concatenarCadena id10,reporte
+    concatenarCadena op10,reporte
+    concatenarCadena simboloigual,reporte
+    concatenarCadena res10,reporte
+    concatenarCadena html14,reporte
 
+    jmp GenerarReporte
 salir:
     close
 
@@ -405,11 +555,6 @@ guardar1:
     push si
     concatenarCadena signo3,res1
     concatenarCadena conver,res1
-    print saltolinea
-    print op1
-    print saltolinea
-    print res1
-    delay 160
     jmp menu
 guardar2:
     concatenarCadena operacionactual,op2
@@ -514,6 +659,38 @@ terminadofactorial:
     print conver
     delay 150
     jmp menu
+; ================================ funciones para el reporte ===============================
+GenerarReporte:
+
+    concatenarCadena html15,reporte
+    concatenarCadena html16,reporte
+
+
+    ;Limpiamos variables que utilizamos para escribir
+    limpiar rute, SIZEOF rute,24h ;limpiamos el arreglo bufferentrada con $
+    limpiar buffer, SIZEOF buffer,24h ;limpiamos el arreglo bufferentrada con $
+
+    ;ObtenerTexto nombreArchivo (Por alguna razon aveces no se obtiene bien el nombre del archivo
+    ;Y lo pueden ingresar manual en caso de cualquier error)
+    mov nombreArchivo[0],114 ;R
+    mov nombreArchivo[1],101 ;E
+    mov nombreArchivo[2],112 ;P
+    mov nombreArchivo[3],46  ;.
+    mov nombreArchivo[4],104 ;h
+    mov nombreArchivo[5],116 ;t
+    mov nombreArchivo[6],109 ;m
+    mov nombreArchivo[7],108 ;l
+
+    ;Interrupcion para crear el archivo
+    crear nombreArchivo, handler
+    ;Interrupcion para escribir el archivo
+    escribir handler, reporte, SIZEOF reporte
+    ;Interrupcion para cerrar como que el buffer que se utilizo para escribir
+    cerrar handler
+
+    delay 20
+    jmp menu
+
 ;=============================== errores ===============================
 error0:
     print Errord1
@@ -573,6 +750,53 @@ error6:
     delay 35
     clear
     jmp menu
+error7:
+    print Errord1
+    print Errord2
+    print mesajeError7
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+error8:
+    print Errord1
+    print Errord2
+    print mesajeError8
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+error9:
+    print Errord1
+    print Errord2
+    print mesajeError9
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+error10:
+    print Errord1
+    print Errord2
+    print mesajeError10
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+error11:
+    print Errord1
+    print Errord2
+    print mesajeError11
+    print Errord3
+    print saltolinea
+    delay 35
+    clear
+    jmp menu
+
+
 main endp
 end main
 

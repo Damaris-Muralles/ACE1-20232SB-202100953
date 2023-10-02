@@ -53,6 +53,45 @@ Obtenernombrearchivo macro cadena
         mov al, 36 ;ascii del signo $ o en hexadecimal 24h
         mov cadena[di],al  ;copiamos el $ a la cadena
 endm 
+;obtener un fecha y comvertirlo a texto
+ObtenerFecha macro cadena,temp,temp1,temp3,temp4,simbolose
+    mov si,0
+    push si
+    mov ah, 2Ah ; interrupción para obtener la fecha
+    int 21h     ; llamada al sistema DOS
+    mov temp3,dh
+    mov temp4,dl
+    ConverString temp4,temp
+    concatenarCadena temp,cadena
+    concatenarCadena simbolose,cadena
+    ConverString temp3,temp
+    concatenarCadena temp,cadena
+    concatenarCadena simbolose,cadena
+    concatenarCadena temp1,cadena
+    
+endm
+
+; Macro para obtener la hora
+ObtenerHora macro cadena,temp,temp1,temp2,temp3,simbolose
+    mov si,0
+    push si
+    mov ah, 2Ch ; interrupción para obtener la hora
+    int 21h     ; llamada al sistema DOS
+
+    ; Convertir la hora a cadena
+    mov temp1,ch; hora
+    mov temp2,cl; minuto
+    mov temp3,dh; segundo
+
+    ConverString temp1,temp
+    concatenarCadena temp,cadena
+    concatenarCadena simbolose,cadena
+    ConverString temp2,temp
+    concatenarCadena temp,cadena
+    concatenarCadena simbolose,cadena
+    ConverString temp3,temp
+    concatenarCadena temp,cadena
+endm
 ;limpiar pantalla
 clear macro 
          print skip
@@ -207,7 +246,7 @@ cerrar macro handler
 	mov bx, handler
 	int 21h
 	;jc Error2
-    jc error9
+    jc error8
 	mov handler,ax
 
 endm
@@ -224,7 +263,7 @@ crear macro buffer, handler
 	lea dx,buffer
 	int 21h
 	;jc Error4
-    jc error5
+    jc error10
 	mov handler, ax
 
 
@@ -245,7 +284,7 @@ escribir macro handler, buffer, numbytes
 	lea dx, buffer
 	int 21h
 	;jc Error3
-    jc error8
+    jc error9
 
 endm
 
@@ -277,7 +316,7 @@ leer macro handler,buffer, numbytes
 	lea dx,buffer ; mov dx,offset buffer 
 	int 21h
 	;jc  Error5
-    jc error6
+    jc error11
 
 endm
 
@@ -574,6 +613,10 @@ endm
 
 
 ConverString macro numero,convertido
+    xor ax,ax
+    xor al,al
+    xor dl,dl
+    
     mov al, numero     
     aam               
     add ax, 3030h     
@@ -584,6 +627,7 @@ ConverString macro numero,convertido
     mov al,dl
     mov convertido[1], al
 endm
+
 factorialm macro numero, resultado,guardar;, procedimiento,simf1,simf2,valor
     mov al, numero
     mov bl,al
@@ -593,6 +637,3 @@ factorialm macro numero, resultado,guardar;, procedimiento,simf1,simf2,valor
     mov resultado,al
     ConverString resultado,guardar
 endm
-
-
-; ================================= DE USO ESPECIFICO =================================
