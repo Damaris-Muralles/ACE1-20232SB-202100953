@@ -70,6 +70,8 @@ mensajeOp db 0ah,0dh, '  --> Ingrese un operador: ','$'
 mensajeOperacion db 0ah,0dh, '  --> Ingrese un operador o "=" para finalizar: ','$'
 mensajeGuardar db 0ah,0dh, '  --> Desea guardar (s/n): ','$'
 
+mensajeRuta db 0ah,0dh, '  --> Ingrese la ruta del archivo: ','$'
+
 
 ; ======================================== MENSAJES SALIDAS  ========================================
 mensajeResultado db 0ah,0dh, '  --> El resultado es: ','$'
@@ -178,6 +180,7 @@ html14 db '</h3>', '$'
 html15 db 0ah,0dh,'</body>', '$'
 html16 db 0ah,0dh,'</html>', '$'
 
+; =============================== VARIABLES PARA EL ARCHIVO =============================== 
 nombreArchivo db 'REP.html',0
 
 ;Cadena que almacenada todo el reporte esta llena de espacios vacios
@@ -185,10 +188,16 @@ reporte db 30000 dup(' '), '$'
 
 ;Maneja como la interrupcion del buffer que utilizaremos para escribir
 ;Datos del archivo
-rute db 'c:/masm611/bin/REP.html' ,'00h' ;ojo con el 00h es importante
-handler dw ?
-buffer db 2000 dup(' '), '$'
+rutauser db 50 dup('$'), '00h'
+; c:/masm611/bin/HELP.TXT
+ruta db 50 dup('$'), '00h'
 
+rute db 'c:/masm611/bin/ent.arq' ,'00h'
+
+handler dw ?
+buffer db 2000 dup('$'), '$'
+Operaciones db 2000 dup('$'), '$'
+contador dw 0
 ; ================================ VARIABLES PARA FECHA Y HORA ================================
 fecha1 db 50 dup('$'), '$'
 hora1 db 50 dup('$'), '$'
@@ -198,7 +207,7 @@ temp2 db 50 dup('$'), '$'
 temp3 db 50 dup('$'), '$'
 simbolose db '/', '$'
 simbolopp db ':', '$'
-; =============================== VARIABLES PARA EL ARCHIVO =============================== 
+
 
 ; ==================== segmento de codigo ====================
 
@@ -247,6 +256,30 @@ menu:
     mov si,0
     push si
     mov operandos,0
+    limpiar operacionactual, SIZEOF operacionactual,'$'
+    limpiar numero1, SIZEOF numero1,'$'
+    limpiar numero2, SIZEOF numero2,'$'
+    limpiar num1, SIZEOF num1,'$'
+    limpiar num2, SIZEOF num2,'$'
+    limpiar num3, SIZEOF num3,'$'
+    limpiar num4, SIZEOF num4,'$'
+    limpiar resul2, SIZEOF resul2,'$'
+    limpiar signo, SIZEOF signo,'$'
+    limpiar signo2, SIZEOF signo2,'$'
+    limpiar signo3, SIZEOF signo3,'$'
+
+    mov al,0
+    mov resul,al
+    mov resul2,al
+    mov test1,al
+    mov test2,al
+    limpiar conver, SIZEOF conver,'$'
+    limpiar resultado2, SIZEOF resultado2,'$'
+    limpiar operacionfactorial, SIZEOF operacionfactorial,'$'
+    
+    mov si,0
+    push si
+    mov operandos,0
     print decoinicio
     print menu1
     print menu2
@@ -282,9 +315,10 @@ menu:
     jmp error1
 
 cargarArchivo:
-    print menu6
-    delay 50
-    jmp menu
+    print saltolinea
+    print mensajeRuta
+    ObtenerTexto rutauser
+    jmp entrada
 calculadora:
     print saltolinea
     print mensajeIngresonum
@@ -307,17 +341,19 @@ calculadora:
     jmp veroperacion
 
 factorial:
-    mov si,0
-    push si
+
     mov resultado2,1
     print saltolinea
     print mensajeIngresonum
     ObtenerTexto numero1
     extractorCompleto numero1,num1,num2,signo,test1
     conversor num1,resul,num2
+    mov si,0
+    push si
     concatenarCadena num1,operacionfactorial
     concatenarCadena simbolofactorial,operacionfactorial
     concatenarCadena simboloigual,operacionfactorial
+    
     mov al, 1
     cmp resul,0
     je cerofactorial
@@ -477,7 +513,6 @@ multip:
     ;Ejecutamos una multiplicacion
     multiplicar resul,test1,resul2,test2,resultado2,signo3
     jmp otroOperando
-    
 
 division:
     
@@ -622,6 +657,7 @@ guardar10:
 ; ================================ funciones para el factorial ===============================
 proceFactorial:
     mov numfact,al
+    
     ConverString numfact,conver
     concatenarCadena espaciosep,operacionfactorial
     concatenarCadena conver,operacionfactorial
@@ -667,7 +703,7 @@ GenerarReporte:
 
 
     ;Limpiamos variables que utilizamos para escribir
-    limpiar rute, SIZEOF rute,24h ;limpiamos el arreglo bufferentrada con $
+    limpiar ruta, SIZEOF ruta,24h ;limpiamos el arreglo bufferentrada con $
     limpiar buffer, SIZEOF buffer,24h ;limpiamos el arreglo bufferentrada con $
 
     ;ObtenerTexto nombreArchivo (Por alguna razon aveces no se obtiene bien el nombre del archivo
@@ -689,6 +725,93 @@ GenerarReporte:
     cerrar handler
 
     delay 20
+    jmp menu
+
+; ================================ funciones para el archivo ===============================
+entrada:
+    abrir rute,handlerentrada  ;le mandamos la ruta y el handler,que será la referencia al fichero 
+    limpiar buffer, SIZEOF buffer,24h  ;limpiamos la variable donde guardaremos los datos del archivo 
+    leer handlerentrada, buffer, SIZEOF buffer ;leemos el archivo
+    cerrar handlerentrada
+    limpiar conver, SIZEOF conver,'$' 
+    mov si,0
+    ;Limpieza de los registros
+    xor bx,bx
+    xor cx,cx
+    jmp encontrarid
+
+encontrarid:
+    
+    mov al,buffer[bx]
+    cmp al,58 ;simbolo comillas ASCII
+    je encontrado
+    mov conver[si],al
+    
+    
+    ;(Tener cuidado ya que si no hay condicion de salida se encicla)
+    ;Salida de emergencia mas de 200 de llegada del indice, pueden poner un mayor
+    cmp bx,1000
+    je emergencia
+
+
+    ;Incrementamos el indice
+    inc bx 
+    inc si
+    ;Si no es el que buscamos volvemos a buscar 
+    jmp encontrarid
+encontrado:
+    mov si,0
+    push si
+    concatenarCadena conver,Operaciones
+    concatenarCadena simboloigual,Operaciones
+    limpiar operacionactual, SIZEOF operacionactual,'$'
+    limpiar conver, SIZEOF conver,'$'
+    mov si,0
+    inc bx
+    jmp encontrarOperacion
+
+encontrarOperacion:
+    mov al,buffer[bx]
+    cmp al,44 ;simbolo comillas ASCII
+    je encontrada
+    mov conver[si],al
+    
+    ;(Tener cuidado ya que si no hay condicion de salida se encicla)
+    ;Salida de emergencia mas de 200 de llegada del indice, pueden poner un mayor
+    cmp bx,1000
+    je emergencia
+
+
+    ;Incrementamos el indice
+    inc bx
+    inc si
+    ;Si no es el que buscamos volvemos a buscar 
+    jmp encontrarOperacion
+
+encontrada:
+    mov contador, bx
+    mov si,0
+    push si
+    concatenarCadena conver,operacionactual
+    prefijolect operacionactual,numero1,num1,num2,resul,test1,numero2,num3,num4,resul2,test2,simbolo,resultado2,signo3
+   
+    mov si,0
+    push si
+    print saltolinea
+    print Operaciones
+    print signo3
+    imprimirDecimal resultado2,conver 
+    limpiar conver, SIZEOF conver,'$' 
+    limpiar Operaciones, SIZEOF Operaciones,'$'
+    mov bx,contador
+    inc bx
+    mov si,0
+   
+    jmp encontrarid
+emergencia:
+    print presionarTecla
+    getChar
+    print saltolinea
     jmp menu
 
 ;=============================== errores ===============================
@@ -795,7 +918,6 @@ error11:
     delay 35
     clear
     jmp menu
-
 
 main endp
 end main

@@ -637,3 +637,122 @@ factorialm macro numero, resultado,guardar;, procedimiento,simf1,simf2,valor
     mov resultado,al
     ConverString resultado,guardar
 endm
+prefijolect macro cadena,numero1,num1,num2,resul,test1,numero2,num3,num4,resul2,test2,simbolo,resultado2,signo3
+    Local longitud,long1,recorrer,imprec,fin,restarec,multirec,divrec,sumarec,modificarcad,desplazarnum
+    ;,numbers,modificarcad,numbersigno1,numbersigno2,numbersigno21
+    mov si,0
+    mov di,0
+    longitud:
+        mov al,cadena[di]
+        cmp al,36 ;simbolo comillas ASCII
+        je long1
+        
+        ;(Tener cuidado ya que si no hay condicion de salida se encicla)
+        ;Salida de emergencia mas de 200 de llegada del indice, pueden poner un mayor
+        cmp di,200
+        je fin
+
+
+        ;Incrementamos el indice
+        inc di
+        ;Si no es el que buscamos volvemos a buscar 
+        jmp longitud
+    long1:
+        ; Copia el valor de di a la variable contador
+        mov si, di
+        ; Aquí comienza a recorrer desde la posición actual de contador hasta el 0
+    recorrer:
+        dec si ; Decrementa contador para moverse al carácter anterior
+        cmp si, 0
+        jl fin ; Si contador < 0, termina el bucle
+        ; Imprime el carácter actual
+        mov al, cadena[si] ; Carga el carácter actual en AL
+        ; mov dl, al ; Mueve el carácter a DL
+        ;mov ah, 2 ; Selecciona el servicio 2 (imprimir carácter) de la interrupción 21h
+        ;int 21h ; Llama a la interrupción 21h para imprimir el carácter
+        cmp al, 43 ; Suma
+        je imprec
+        ;je sumarec
+        cmp al, 45 ; Resta
+        je imprec
+        ;je restarec
+        cmp al, 42 ; Multiplicación
+        je imprec
+        je multirec
+        cmp al, 47 ; División
+        je imprec
+        ;je divrec
+        ;jmp numbers
+        mov numero1[0],al
+        inc si
+        mov al,cadena[si]
+        mov numero1[1],al
+        inc si 
+        mov al,cadena[si]
+        mov numero2[0],al
+        inc si
+        mov al,cadena[si]
+        mov numero2[1],al
+        dec si
+        dec si
+        dec si
+        jmp recorrer ; Vuelve al inicio del bucle para continuar recorriendo la cadena
+    imprec:
+        mov simbolo,al
+        ;print numero1
+        ;print simbolo
+        ;print numero2
+        extractorCompleto numero1,num1,num2,signo,test1
+        conversor num1,resul,num2
+        extractorCompleto numero2,num3,num4,signo2,test2
+        conversor num3,resul2,num4
+        mov al,simbolo
+        cmp al, 43 ; Suma
+        je sumarec
+        cmp al, 45 ; Resta
+        je restarec
+        cmp al, 42 ; Multiplicación
+        je multirec
+        cmp al, 47 ; División
+        je divrec
+    multirec:
+        multiplicar resul,test1,resul2,test2,resultado2,signo3
+        jmp modificarcad
+
+    divrec:
+        dividir resul,test1,resul2,test2,resultado2,signo3
+        jmp modificarcad
+    sumarec:
+        sumar resul,test1,resul2,test2,resultado2,signo3
+        jmp modificarcad
+    restarec:
+        restar resul,test1,resul2,test2,resultado2,signo3
+
+        jmp modificarcad
+    modificarcad:
+        ConverString resultado2,numero1
+        mov al,numero1[0]
+        mov cadena[si],al
+        inc si
+        mov al,numero1[1]
+        mov cadena[si],al
+        inc si
+        jmp desplazarnum
+    desplazarnum:
+        mov al,cadena[si+3]
+        ; imprimir salto por medio de interrupcion
+
+        mov cadena[si],al
+        inc si
+        cmp si,di
+        jne desplazarnum
+        mov al,36
+        mov cadena[si],al
+        mov si,0
+        mov di,0
+       ; print cadena
+        jmp longitud
+    
+    fin:
+    
+endm
