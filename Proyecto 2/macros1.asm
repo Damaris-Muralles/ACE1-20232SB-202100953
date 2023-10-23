@@ -13,6 +13,19 @@ getChar macro
     mov ah,01h ;se guarda en al en código hexadecimal del caracter leído 
     int 21h
 endm
+contarLongitud macro cadena
+    Local contador,fin
+    xor di,di
+    xor al,al
+    contador:
+        cmp cadena[di],36
+        je fin
+        inc al
+        inc di
+        jmp contador
+    fin:
+
+endm
 ;macro para recibir una cadena, varios caracteres
 ObtenerTexto macro cadena  
 
@@ -32,6 +45,324 @@ ObtenerTexto macro cadena
         mov al, 36 ;ascii del signo $ o en hexadecimal 24h
         mov cadena[di],al  ;copiamos el $ a la cadena
 endm 
+ObtenerContra macro cadena,contador,caracter
+
+ LOCAL ObtenerChar, endTexto,minus,especi
+    ;si, cx, di  registros que usualmente se usan como contadores 
+    xor si,si  ; => mov si, 0  reinica el contador
+    ;[a-zA-Z*_.-@+?]+
+    ObtenerChar:
+        getChar  ;llamamos al método de obtener caracter 
+        cmp al, 0dh ; como se guarda en al, comparo si al es igual a salto de línea, ascii de salto de linea en hexadecimal o 10en ascii
+        je endTexto ;si es igual que el salto de línea, nos vamos a la etiqueta endTexto, donde agregamos el $ de dolar a la entrada 
+        mov caracter[0],al
+        ContadorMayus caracter,contador
+        cmp contador,0
+        je minus
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    minus: 
+        ContadorMinus caracter,contador
+        cmp contador,0
+        je especi
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    especi:
+        ContadorEspecial caracter,contador
+        cmp contador,0
+        je error16
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    endTexto:
+        mov al, 36 ;ascii del signo $ o en hexadecimal 24h
+        mov cadena[si],al  ;copiamos el $ a la cadena
+        
+endm
+
+ObtenerUser macro cadena,contador,caracter
+
+ LOCAL ObtenerChar, endTexto ,primerCaracter,minus,numver,especi
+    ;si, cx, di  registros que usualmente se usan como contadores 
+    xor si,si  ; => mov si, 0  reinica el contador
+    ;[a-z][a-z0-9._-]*
+    ObtenerChar:
+        getChar  ;llamamos al método de obtener caracter 
+        cmp al, 0dh ; como se guarda en al, comparo si al es igual a salto de línea, ascii de salto de linea en hexadecimal o 10en ascii
+        je endTexto ;si es igual que el salto de línea, nos vamos a la etiqueta endTexto, donde agregamos el $ de dolar a la entrada 
+        mov caracter[0],al
+        cmp si,0
+        je primerCaracter
+        jne minus
+       
+        
+    minus: 
+        ContadorMinus caracter,contador
+        cmp contador,0
+        je numver
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    numver:
+        ContadorNum caracter,contador
+        cmp contador,0
+        je especi
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    especi:
+        ContadorEspecial1 caracter,contador
+        cmp contador,0
+        je error16
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    primerCaracter:
+        ContadorMinus caracter,contador
+        cmp contador,0
+        je error16
+        mov cadena[si],al ; mov destino, fuente.  Vamos copiando el ascii del caracter que se guardó en al, al vector cadena en la posicion del contador si
+        inc si ; => si = si+1
+        jmp ObtenerChar
+    endTexto:
+        mov al, 36 ;ascii del signo $ o en hexadecimal 24h
+        mov cadena[si],al  ;copiamos el $ a la cadena
+endm
+
+ContadorMayus macro cadena,cont
+    LOCAL comprobar,fin,aumentar
+    xor di,di
+    mov cont,0
+
+    comprobar:
+        cmp cadena[di],36
+        je fin ; Cargar un byte de la cadena en AL
+        cmp cadena[di],65
+        je aumentar
+        cmp cadena[di],66
+        je aumentar
+        cmp cadena[di],67
+        je aumentar
+        cmp cadena[di],68
+        je aumentar
+        cmp cadena[di],69
+        je aumentar
+        cmp cadena[di],70
+        je aumentar
+        cmp cadena[di],71
+        je aumentar
+        cmp cadena[di],72
+        je aumentar
+        cmp cadena[di],73
+        je aumentar
+        cmp cadena[di],74
+        je aumentar
+        cmp cadena[di],75
+        je aumentar
+        cmp cadena[di],76
+        je aumentar
+        cmp cadena[di],77
+        je aumentar
+        cmp cadena[di],78
+        je aumentar
+        cmp cadena[di],79
+        je aumentar
+        cmp cadena[di],80
+        je aumentar
+        cmp cadena[di],81
+        je aumentar
+        cmp cadena[di],82
+        je aumentar
+        cmp cadena[di],83
+        je aumentar
+        cmp cadena[di],84
+        je aumentar
+        cmp cadena[di],85
+        je aumentar
+        cmp cadena[di],86
+        je aumentar
+        cmp cadena[di],87
+        je aumentar
+        cmp cadena[di],88
+        je aumentar
+        cmp cadena[di],89
+        je aumentar
+        cmp cadena[di],90
+        je aumentar
+        inc di
+        jmp comprobar
+    aumentar:
+        inc cont
+        inc di
+        jmp comprobar
+       
+    fin:
+endm
+
+ContadorMinus macro cadena,cont
+    LOCAL comprobar,fin,aumentar
+    xor di,di
+    mov cont,0
+
+    comprobar:
+        cmp cadena[di],36
+        je fin ; Cargar un byte de la cadena en AL
+        cmp cadena[di],97
+        je aumentar
+        cmp cadena[di],98
+        je aumentar
+        cmp cadena[di],99
+        je aumentar
+        cmp cadena[di],100
+        je aumentar
+        cmp cadena[di],101
+        je aumentar
+        cmp cadena[di],102
+        je aumentar
+        cmp cadena[di],103
+        je aumentar
+        cmp cadena[di],104
+        je aumentar
+        cmp cadena[di],105
+        je aumentar
+        cmp cadena[di],106
+        je aumentar
+        cmp cadena[di],107
+        je aumentar
+        cmp cadena[di],108
+
+        je aumentar
+        cmp cadena[di],109
+        je aumentar
+        cmp cadena[di],110
+        je aumentar
+        cmp cadena[di],111
+        je aumentar
+        cmp cadena[di],112
+        je aumentar
+        cmp cadena[di],113
+        je aumentar
+        cmp cadena[di],114
+        je aumentar
+        cmp cadena[di],115
+        je aumentar
+        cmp cadena[di],116
+        je aumentar
+        cmp cadena[di],117
+        je aumentar
+        cmp cadena[di],118
+        je aumentar
+        cmp cadena[di],119
+        je aumentar
+        cmp cadena[di],120
+        je aumentar
+        cmp cadena[di],121
+        je aumentar
+        cmp cadena[di],122
+        je aumentar
+        inc di
+        jmp comprobar
+    aumentar:
+        inc cont
+        inc di
+        jmp comprobar
+       
+    fin:
+endm
+ContadorNum macro cadena,cont
+    LOCAL comprobar,fin,aumentar
+    xor di,di
+    mov cont,0
+    
+
+    comprobar:
+        cmp cadena[di],36
+        je fin ; Cargar un byte de la cadena en AL
+        cmp cadena[di],48
+        je aumentar
+        cmp cadena[di],49
+        je aumentar
+        cmp cadena[di],50
+        je aumentar
+        cmp cadena[di],51
+        je aumentar
+        cmp cadena[di],52
+        je aumentar
+        cmp cadena[di],53
+        je aumentar
+        cmp cadena[di],54
+        je aumentar
+        cmp cadena[di],55
+        je aumentar
+        cmp cadena[di],56
+        je aumentar
+        cmp cadena[di],57
+        je aumentar
+        inc di
+        jmp comprobar
+    aumentar:
+        inc cont
+        inc di
+        jmp comprobar
+       
+    fin:
+endm
+ContadorEspecial1 macro cadena,cont
+    LOCAL comprobar,fin,aumentar
+    xor di,di
+    mov cont,0
+    
+
+    comprobar:
+        cmp cadena[di],36
+        je fin
+        cmp cadena[di],46
+        je aumentar
+        cmp cadena[di],45
+        je aumentar
+        cmp cadena[di],95
+        je aumentar
+        inc di
+        jmp comprobar
+    aumentar:
+        inc cont
+        inc di
+        jmp comprobar
+    fin:
+endm
+ContadorEspecial macro cadena,cont
+    LOCAL comprobar,fin,aumentar
+    xor di,di
+    mov cont,0
+    
+
+    comprobar:
+        cmp cadena[di],36
+        je fin
+        cmp cadena[di],46
+        je aumentar
+        cmp cadena[di],45
+        je aumentar
+        cmp cadena[di],95
+        je aumentar
+        cmp cadena[di],42
+        je aumentar
+        cmp cadena[di],43
+        je aumentar
+        cmp cadena[di],63
+        je aumentar
+        cmp cadena[di],64
+        je aumentar
+        inc di
+        jmp comprobar
+    aumentar:
+        inc cont
+        inc di
+        jmp comprobar
+    fin:
+endm
 ; obtener una cadena que contine un nombre pero sin la extension
 Obtenernombrearchivo macro cadena 
 
@@ -148,6 +479,33 @@ concatenarCadena macro origen,destino
         mov di,0
 
 endm
+concatenarCadena1 macro origen,destino
+    ;xor si,si  ; => mov si, 0  reinica el contador
+    LOCAL ObtenerCaracter,  termino,buscar
+    ;Limpiamos el indice si y di 
+    mov si,0
+    mov di,0
+    buscar:
+        cmp destino[si], 36
+        je ObtenerCaracter
+        inc si
+        cmp si, 1000
+        je error18
+        jmp buscar
+    ObtenerCaracter:
+        cmp origen[di], 36
+        je termino
+        mov al, origen[di]
+        mov destino[si], al
+        inc si
+        inc di
+        jmp ObtenerCaracter 
+    termino:
+        mov si,0
+        mov di,0
+
+endm
+
 ; macro para hacer una pausa de n*55ms
 delay macro tiempo
     LOCAL espera
@@ -213,7 +571,66 @@ compararcadena macro cadena1, cadena2, auxiliar
     
     fin:
 endm
-
+encriptarPass macro cadena 
+    LOCAL ObtenerCaracter,  termino
+    ;Limpiamos el indice si y di 
+    mov si,0
+    mov di,0
+    ;En base a la cadena que queremos guardar extraemos caracter por caracter
+    ;Y lo guardamos en el destino
+    ;Esto es como realizar un += para que podamos concatenar cadenas
+    ObtenerCaracter:
+        cmp cadena[di], 36
+        je termino
+        mov al, 42
+        mov cadena[di], al
+        inc di
+        jmp ObtenerCaracter 
+    termino:
+        mov di,0
+endm
+iralfinal macro destino,contador
+ LOCAL termino,buscar
+    ;Limpiamos el indice si y di 
+    mov si,0
+    mov di,0
+    buscar:
+        cmp destino[si], 36
+        je termino
+        inc si
+        cmp si, 1000
+        je error18
+        jmp buscar
+    termino:
+        dec si
+        dec si
+        mov contador,si
+endm
+buscarlimite macro destino,contador
+    LOCAL termino,buscar,fin
+    ;Limpiamos el indice si y di
+    mov si,contador
+    mov di,0
+    buscar:
+        cmp destino[si], 44
+        je termino
+        cmp si,0
+        je fin
+        dec si
+        jmp buscar
+    termino:
+        inc si
+        inc di
+        cmp di,15
+        je fin
+        dec si
+        dec si
+        jmp buscar
+    fin:
+        mov contador,si
+        mov si,0
+        mov di,0
+endm
 ; generar numero random de 0 a 7
 generarrandom macro letras
     LOCAL fin
@@ -357,7 +774,6 @@ leer macro handler,buffer, numbytes
     jc error11
 
 endm
-
 
 ;Operaciones aritmeticas
 ; Macro para la suma
