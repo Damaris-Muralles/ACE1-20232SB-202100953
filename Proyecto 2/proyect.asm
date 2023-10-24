@@ -201,13 +201,18 @@ sresta db '-', '$'
 
 ; =============================== VARIABLES PARA EL JUEGO ===============================
 conver db 100 dup('$') , '$'
+puntuacionVideo db '038457' , '$'
+vidasVideo db 'X X X' , '$'
 ;---------------------------------VARIABLES PARA MODO VIDEO---------------------------------
+
+;--------------Variables para utiliza en modo video-----------------
 columna db 0
 fila db 0
 contador db 0
 posicionX dw 0
 posicionY dw 0
-
+;Seleccionar pagina 
+pagina db 0
 ;Para dibujar el tablero
 posicionTableroX dw 0
 posicionTableroY dw 0
@@ -215,6 +220,12 @@ posicionTableroY dw 0
 ;Para dibujar los carriles
 posicionCarrilesX dw 0
 posicionCarrilesY dw 0
+;Para dibujar la division de los carriles
+posicionDivisionCarrilesX dw 0
+posicionDivisionCarrilesY dw 0
+contadorPixelesSeparacion dw 0
+
+
 
 ;Manejar la posicion del personaje
 posicionPersonajeX dw 0
@@ -223,15 +234,129 @@ posicionPersonajeY dw 0
 ;Manejar la posicion del carro
 posicionCarroX dw 0
 posicionCarroY dw 0
-contadorPosicionCarro db 0
+cicloDuracion dw 0
+colorpixel db 0
 
-;Para dibujar la division de los carriles
-posicionDivisionCarrilesX dw 0
-posicionDivisionCarrilesY dw 0
-contadorPixelesSeparacion dw 0
+;Diseño carro #1
+disenoCarro1 dw 0
+posicionCarro1X dw 0
+posicionCarro1Y dw 0
+PosicionI1 dw 0
+posicionCarro1X_Temp dw 0
+posicionCarro1Y_Temp dw 0
+velocidadCarro1 dw 0
+OrientacionCarro1 dw 1
 
-;Seleccionar pagina 
-pagina db 0
+
+
+;Diseño carro #2
+disenoCarro2 dw 0
+posicionCarro2X dw 0
+posicionCarro2Y dw 0
+PosicionI2 dw 0
+posicionCarro2X_Temp dw 0
+posicionCarro2Y_Temp dw 0
+velocidadCarro2 dw 0
+OrientacionCarro2 dw 1
+
+;Diseño carro #3
+disenoCarro3 dw 0
+posicionCarro3X dw 0
+posicionCarro3Y dw 0
+PosicionI3 dw 0
+posicionCarro3X_Temp dw 0
+posicionCarro3Y_Temp dw 0
+velocidadCarro3 dw 0
+OrientacionCarro3 dw 1
+
+;Diseño carro #4
+disenoCarro4 dw 0
+posicionCarro4X dw 0
+posicionCarro4Y dw 0
+PosicionI4 dw 0
+posicionCarro4X_Temp dw 0
+posicionCarro4Y_Temp dw 0
+velocidadCarro4 dw 0
+OrientacionCarro4 dw 1
+
+;Diseño carro #5
+disenoCarro5 dw 0
+posicionCarro5X dw 0
+posicionCarro5Y dw 0
+PosicionI5 dw 0
+posicionCarro5X_Temp dw 0
+posicionCarro5Y_Temp dw 0
+velocidadCarro5 dw 0
+OrientacionCarro5 dw 1
+;Diseño carro #6
+disenoCarro6 dw 0
+posicionCarro6X dw 0
+posicionCarro6Y dw 0
+PosicionI6 dw 0
+posicionCarro6X_Temp dw 0
+posicionCarro6Y_Temp dw 0
+velocidadCarro6 dw 0
+OrientacionCarro6 dw 1
+
+;Diseño carro #7
+disenoCarro7 dw 0
+posicionCarro7X dw 0
+posicionCarro7Y dw 0
+PosicionI7 dw 0
+posicionCarro7X_Temp dw 0
+posicionCarro7Y_Temp dw 0
+velocidadCarro7 dw 0
+OrientacionCarro7 dw 1
+
+;Diseño carro #8
+disenoCarro8 dw 0
+posicionCarro8X dw 0
+posicionCarro8Y dw 0
+PosicionI8 dw 0
+posicionCarro8X_Temp dw 0
+posicionCarro8Y_Temp dw 0
+velocidadCarro8 dw 0
+OrientacionCarro8 dw 1
+
+;Diseño carro #9
+disenoCarro9 dw 0
+posicionCarro9X dw 0
+posicionCarro9Y dw 0
+PosicionI9 dw 0
+posicionCarro9X_Temp dw 0
+posicionCarro9Y_Temp dw 0
+velocidadCarro9 dw 0
+OrientacionCarro9 dw 1
+
+;Diseño carro #10
+disenoCarro10 dw 0
+posicionCarro10X dw 0
+posicionCarro10Y dw 0
+PosicionI10 dw 0
+posicionCarro10X_Temp dw 0
+posicionCarro10Y_Temp dw 0
+velocidadCarro10 dw 0
+OrientacionCarro10 dw 1
+
+;Diseño carro #11
+disenoCarro11 dw 0
+posicionCarro11X dw 0
+posicionCarro11Y dw 0
+PosicionI11 dw 0
+posicionCarro11X_Temp dw 0
+posicionCarro11Y_Temp dw 0
+velocidadCarro11 dw 0
+OrientacionCarro11 dw 1
+
+;Diseño carro #12
+disenoCarro12 dw 0
+posicionCarro12X dw 0
+posicionCarro12Y dw 0
+PosicionI12 dw 0
+posicionCarro12X_Temp dw 0
+posicionCarro12Y_Temp dw 0
+velocidadCarro12 dw 0
+OrientacionCarro12 dw 1
 
 
 ; ============================================== segmento de codigo ===================================
@@ -268,6 +393,9 @@ Video:
 
 	jmp MenuInfo
 MenuInfo:
+		mov ax,@data
+		mov ds,ax
+		mov es,ax
 		call limpiarEnColorNegro
 		mov columna, 2
 		mov fila, 8
@@ -455,6 +583,7 @@ InicioRegistro:
 
 salirPrograma:
 	CALL modoVideoFinalizar
+	delay 400
 	jmp salir
 
 salir:
@@ -713,6 +842,8 @@ comprobandocredencial:
 	mov si,0
 	mov al,RolAr[0]
 	mov rolensesion,al
+	limpiar fecha1, SIZEOF fecha1,'$'
+	limpiar hora1, SIZEOF hora1,'$'
 	ObtenerFecha fecha1,conver,temp16,temp2,temp3,simbolose
     ObtenerHora hora1,conver,temp1,temp2,temp3,simbolopp
 	jmp puntajeArchivo
@@ -752,6 +883,8 @@ RepeirIntento:
 	cmp al,0
 	je error1
 	mov si,0
+	limpiar fecha1, SIZEOF fecha1,'$'
+	limpiar hora1, SIZEOF hora1,'$'
 	ObtenerFecha fecha1,conver,temp16,temp2,temp3,simbolose
     ObtenerHora hora1,conver,temp1,temp2,temp3,simbolopp
 	mov si,0
@@ -1250,8 +1383,8 @@ menuAdminOriginal:
 	je degradarusuario1
 	cmp al,65 ;mnemonio 31h = 1 en hexadecimal, ascii 49
 	je generarReporte
-	;cmp al,66 ;mnemonio 31h = 1 en hexadecimal, ascii 49
-	;je menuAdminOriginal8
+	cmp al,66 ;mnemonio 31h = 1 en hexadecimal, ascii 49
+	je inicioTablero
 	cmp al,67 ;mnemonio 31h = 1 en hexadecimal, ascii 49
 	je ultimasPartidas
 	cmp al,68 ;mnemonio 31h = 1 en hexadecimal, ascii 49
@@ -1445,9 +1578,556 @@ ultimasPartidas:
 
 
 ;=========================================== JUEGO ===========================================
+inicioTablero: 
+		;Limpiamos la pagina
+		CALL limpiarEnColorNegro
+
+		;Colocamos en la pagina 1 para hacer sincronizacion
+		mov pagina, 1
+
+		
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+		mov posicionTableroX,0
+		mov posicionTableroY,8
+
+		;Ahora limpiamos la pantalla
+		;CALL limpiarEnColorNegro
+
+		jmp tablero
 
 
-;=============================== errores ===============================
+tablero:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+
+		;Empezamos a graficar pagina 0
+		mov ah, 0ch                ;Indicar que se imprimira un pixel
+		mov dx, posicionTableroY   ;DX coordenada en Y
+		mov cx, posicionTableroX   ;CX coordenada en X
+		mov bh, pagina             ;BH la pagina a imprimir
+		mov al, 7                  ;Color que queremos colocar
+		int 10h
+
+		;Empezamos a graficar pagina 1
+		mov ah, 0ch                ;Indicar que se imprimira un pixel
+		mov dx, posicionTableroY   ;DX coordenada en Y
+		mov cx, posicionTableroX   ;CX coordenada en X
+		mov bh, 1                  ;BH la pagina a imprimir
+		mov al, 7                  ;Color que queremos colocar
+		int 10h
+
+		;Aumentamos la posicionTableroY
+		xor ax,ax
+		mov ax, posicionTableroY
+		add ax, 1
+		mov posicionTableroY, ax
+
+		;Mientras estemos dentro de < = a 192 imprimimos la fila
+		cmp posicionTableroY, 192
+		jbe tablero           ;Si es menor o igual salta
+
+		;Como se sobre paso reiniciamos la posicionTableroY y aumentamos la posicion tablero X
+		xor ax,ax 
+		mov posicionTableroY, 8
+		mov ax, posicionTableroX
+		add ax, 1
+		mov posicionTableroX, ax
+
+		;Verificamos que hayamos terminado las columnas
+		;Mientras estemos dentro de < = a 320 seguimos analizando
+		cmp posicionTableroX, 320
+		jbe tablero           ;Si es menor o igual salta
+
+		;Esperamos un caracter
+		;getChar
+
+		;Ahora limpiamos la pantalla
+		;CALL limpiarEnColorNegro
+
+		;jmp logicaVideo ;<---------------------Regresa al inicio de video
+
+		;Regresamos al inicio de video
+		jmp inicioCarriles
+
+inicioCarriles:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+		mov posicionCarrilesX, 0
+		mov posicionCarrilesY, 16
+		
+		jmp Carriles
+
+Carriles:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+
+		;Empezamos a graficar
+		mov ah, 0ch                ;Indicar que se imprimira un pixel
+		mov dx, posicionCarrilesY  ;DX coordenada en Y
+		mov cx, posicionCarrilesX  ;CX coordenada en X
+		mov bh, pagina             ;BH la pagina a imprimir
+		mov al, 8                  ;Color que queremos colocar
+		int 10h
+
+		;Empezamos a graficar pagina 1
+		mov ah, 0ch                ;Indicar que se imprimira un pixel
+		mov dx, posicionTableroY   ;DX coordenada en Y
+		mov cx, posicionTableroX   ;CX coordenada en X
+		mov bh, 1                  ;BH la pagina a imprimir
+		mov al, 7                  ;Color que queremos colocar
+		int 10h
+
+		;Aumentamos la posicionCarrilesY
+		xor ax,ax
+		mov ax, posicionCarrilesY
+		add ax, 1
+		mov posicionCarrilesY, ax
+
+		;Mientras estemos dentro de < = a 184 imprimimos la fila
+		cmp posicionCarrilesY, 184
+		jbe Carriles           ;Si es menor o igual salta
+
+		;Como se sobre paso reiniciamos la posicionCarrilesY y aumentamos la posicionCarrilesX
+		xor ax,ax 
+		mov posicionCarrilesY, 16
+		mov ax, posicionCarrilesX
+		add ax, 1
+		mov posicionCarrilesX, ax
+
+		;Verificamos que hayamos terminado las columnas
+		;Mientras estemos dentro de < = a 320 seguimos analizando
+		cmp posicionCarrilesX, 320
+		jbe Carriles           ;Si es menor o igual salta
+
+		;Como termino de hacer el grafico mostramos la pagina hecha
+		;CALL cambiarPagina
+
+		;Esperamos un caracter
+		;getChar
+
+		;Ahora limpiamos la pantalla
+		;CALL limpiarEnColorNegro
+
+		;jmp logicaVideo
+		jmp inicioDivisionCarriles
+
+inicioDivisionCarriles:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx 
+		xor dx,dx
+		mov posicionDivisionCarrilesX, 0
+		mov posicionDivisionCarrilesY, 24
+		mov contadorPixelesSeparacion,0
+
+		jmp DivisionCarrilesCarriles
+
+DivisionCarrilesCarriles:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+
+		;Empezamos a graficar
+		mov ah, 0ch                			;Indicar que se imprimira un pixel
+		mov dx, posicionDivisionCarrilesY   ;DX coordenada en Y
+		mov cx, posicionDivisionCarrilesX   ;CX coordenada en X
+		mov bh, pagina             			;BH la pagina a imprimir
+		mov al, 15                  		;Color que queremos colocar
+		int 10h
+
+		;Aumentamos la contadorPixelesSeparacion
+		xor ax,ax
+		mov ax, contadorPixelesSeparacion
+		add ax, 1
+		mov contadorPixelesSeparacion, ax
+
+		;Aumentamos la posicionDivisionCarrilesX
+		xor ax,ax
+		mov ax, posicionDivisionCarrilesX
+		add ax, 1
+		mov posicionDivisionCarrilesX, ax
+
+		;Mientras estemos dentro de = a 10 imprimimos la fila
+		cmp contadorPixelesSeparacion, 10
+		je aumentoX           ;Si es menor o igual salta
+
+		jmp DivisionCarrilesCarriles
+
+
+aumentoX:
+		;Reiniciamos el contador
+		mov contadorPixelesSeparacion, 0
+
+		;Aumentamos la posicionDivisionCarrilesX
+		xor ax,ax
+		mov ax, posicionDivisionCarrilesX
+		add ax, 10
+		mov posicionDivisionCarrilesX, ax
+
+		;Vericamos que no hayamos llegado al borde
+		cmp posicionDivisionCarrilesX, 320
+		jbe DivisionCarrilesCarriles           ;Si es menor o igual salta
+
+		;Llegamos al borde aumentamos Y
+		xor ax,ax 
+		mov ax, posicionDivisionCarrilesY
+		add ax, 8
+		mov posicionDivisionCarrilesY,ax
+
+		;Reiniciamos X
+		mov posicionDivisionCarrilesX, 0
+
+		;Vericamos que no hayamos llegado al borde
+		cmp posicionDivisionCarrilesY, 176
+		jbe DivisionCarrilesCarriles           ;Si es menor o igual salta
+
+		;Completamos los carriles
+		CALL cambiarPagina
+
+		
+		
+		jmp cartel
+
+cartel:
+		;Necesitamos colocar en una posicion el cursor
+		mov columna, 0
+		mov fila, 0
+		call colocarCursor
+		print punteouser
+
+		;Necesitamos colocar en una posicion el cursor
+		mov columna, 16
+		mov fila, 0
+		call colocarCursor
+		print vidasVideo
+
+		mov columna, 30
+		mov fila, 0
+		call colocarCursor
+		print vidasVideo
+
+
+		;Necesitamos colocar en una posicion el cursor
+		mov columna, 0
+		mov fila, 24
+		call colocarCursor
+		print ensesion
+
+		;Necesitamos colocar en una posicion el cursor
+		mov columna, 17
+		mov fila, 24
+		call colocarCursor
+		print fecha1
+		;Necesitamos colocar en una posicion el cursor
+		mov columna, 29
+		mov fila, 24
+		call colocarCursor
+		print hora1
+		
+		
+		jmp inicioCarro
+
+inicioCarro:
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+
+		;Inicializamos las variables que vamos a usar
+		generarrandom disenoCarro1
+		generarrandom OrientacionCarro1
+		generarrandom velocidadCarro1
+		mov ax, OrientacionCarro1
+		mov posicionCarro1X,ax    ;Posicion en x donde inicia
+		mov posicionCarro1Y,22   ;Posicion en y donde inicia
+		mov PosicionI1,22
+		mov posicionCarro1X_Temp, 0
+		mov posicionCarro1Y_Temp, 0
+			
+		generarrandom disenoCarro2
+		generarrandom OrientacionCarro2
+		generarrandom velocidadCarro2
+		mov ax, OrientacionCarro2
+		mov posicionCarro2X,ax
+		mov ax, posicionCarro1Y
+		add ax, 9
+		mov posicionCarro2Y,ax
+		mov PosicionI2,ax
+		mov posicionCarro2X_Temp, 0
+		mov posicionCarro2Y_Temp, 0
+
+		mov disenoCarro3, 3
+		mov OrientacionCarro3, 320
+		mov velocidadCarro3, 1
+		mov ax, OrientacionCarro3
+		mov posicionCarro3X,ax 
+		mov ax, posicionCarro2Y
+		add ax, 8
+		mov posicionCarro3Y,ax
+		mov PosicionI3,ax  
+		mov posicionCarro3X_Temp, 0
+		mov posicionCarro3Y_Temp, 0
+
+		mov disenoCarro4, 2
+		mov OrientacionCarro4, 0
+		mov velocidadCarro4, 1
+		mov ax, OrientacionCarro4
+		mov posicionCarro4X,ax
+		mov ax, posicionCarro3Y
+		add ax, 8
+		mov posicionCarro4Y,ax
+		mov PosicionI4,ax
+		mov posicionCarro4X_Temp, 0
+		mov posicionCarro4Y_Temp, 0
+
+		mov disenoCarro5, 1
+		mov OrientacionCarro5, 320
+		mov velocidadCarro5, 1
+		mov ax, OrientacionCarro5
+		mov posicionCarro5X,ax
+		mov ax, posicionCarro4Y
+		add ax, 8
+		mov posicionCarro5Y,ax
+		mov PosicionI5,ax
+		mov posicionCarro5X_Temp, 0
+		mov posicionCarro5Y_Temp, 0
+			mov disenoCarro6, 3
+			mov OrientacionCarro6, 0
+			mov velocidadCarro6, 1
+			mov ax, OrientacionCarro6
+			mov posicionCarro6X,ax
+			mov ax, posicionCarro5Y
+			add ax, 8
+			mov posicionCarro6Y,ax
+			mov PosicionI6,ax
+			mov posicionCarro6X_Temp, 0
+			mov posicionCarro6Y_Temp, 0
+
+			mov disenoCarro7, 2
+			mov OrientacionCarro7, 320
+			mov velocidadCarro7, 1
+			mov ax, OrientacionCarro7
+			mov posicionCarro7X,ax
+			mov ax, posicionCarro6Y
+			add ax, 8
+			mov posicionCarro7Y,ax
+			mov PosicionI7,ax
+			mov posicionCarro7X_Temp, 0
+			mov posicionCarro7Y_Temp, 0
+
+			mov disenoCarro8, 1
+			mov OrientacionCarro8, 0
+			mov velocidadCarro8, 3
+			mov ax, OrientacionCarro8
+			mov posicionCarro8X,ax
+			mov ax, posicionCarro7Y
+			add ax, 8
+			mov posicionCarro8Y,ax
+			mov PosicionI8,ax
+			mov posicionCarro8X_Temp, 0
+			mov posicionCarro8Y_Temp, 0
+
+			mov disenoCarro9, 2
+			mov OrientacionCarro9, 320
+			mov velocidadCarro9, 1
+			mov ax, OrientacionCarro9
+			mov posicionCarro9X,ax
+			mov ax, posicionCarro8Y
+			add ax, 8
+			mov posicionCarro9Y,ax
+			mov PosicionI9,ax
+			mov posicionCarro9X_Temp, 0
+			mov posicionCarro9Y_Temp, 0
+
+			mov disenoCarro10, 2
+			mov OrientacionCarro10, 320
+			mov velocidadCarro10, 1
+			mov ax, OrientacionCarro10
+			mov posicionCarro10X,ax
+			mov ax, posicionCarro9Y
+			add ax, 8
+			mov posicionCarro10Y,ax
+			mov PosicionI10,ax
+			mov posicionCarro10X_Temp, 0
+			mov posicionCarro10Y_Temp, 0
+
+			mov disenoCarro11, 3
+			mov OrientacionCarro11, 0
+			mov velocidadCarro11, 1
+			mov ax, OrientacionCarro11
+			mov posicionCarro11X,ax
+			mov ax, posicionCarro10Y
+			add ax, 8
+			mov posicionCarro11Y,ax
+			mov PosicionI11,ax
+			mov posicionCarro11X_Temp, 0
+			mov posicionCarro11Y_Temp, 0
+
+			mov disenoCarro12, 1
+			mov OrientacionCarro12, 0
+			mov velocidadCarro12, 1
+			mov ax, OrientacionCarro12
+			mov posicionCarro12X,ax
+			mov ax, posicionCarro11Y
+			add ax, 8
+			mov posicionCarro12Y,ax
+			mov PosicionI12,ax
+			mov posicionCarro12X_Temp, 0
+			mov posicionCarro12Y_Temp, 0
+
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+	
+
+		jmp carro
+
+
+
+carro:
+		call cambiarPagina
+		;Posicion donde inicia a limpiar los carriles
+		mov ax, OrientacionCarro1
+		mov posicionCarrilesX, ax
+		mov ax, posicionCarro1Y
+		sub ax, 6
+		mov posicionCarrilesY, ax
+		;Creamos el diseño del carro
+		crearDiseno1 colorpixel,disenoCarro1,posicionCarro1X,posicionCarro1Y,posicionCarro1X_Temp,posicionCarro1Y_Temp,pagina,cicloDuracion,columna,fila
+		movimientoCarril OrientacionCarro1,posicionCarro1X,posicionCarro1Y,velocidadCarro1,posicionCarrilesX,posicionCarrilesY
+		limpiezaCarriles OrientacionCarro1,posicionCarrilesX,posicionCarrilesY,PosicionI1,posicionCarro1X,posicionCarro1Y,pagina
+		
+		mov ax, OrientacionCarro2
+		mov posicionCarrilesX, ax
+		mov ax, posicionCarro2Y
+		sub ax, 6
+		mov posicionCarrilesY, ax
+		;Creamos el diseño del carro 2
+		crearDiseno1 colorpixel,disenoCarro2,posicionCarro2X,posicionCarro2Y,posicionCarro2X_Temp,posicionCarro2Y_Temp,pagina,cicloDuracion,columna,fila
+		movimientoCarril OrientacionCarro2,posicionCarro2X,posicionCarro2Y,velocidadCarro2,posicionCarrilesX,posicionCarrilesY
+		limpiezaCarriles OrientacionCarro2,posicionCarrilesX,posicionCarrilesY,PosicionI2,posicionCarro2X,posicionCarro2Y,pagina
+		
+		mov ax, OrientacionCarro3
+		mov posicionCarrilesX, ax
+		mov ax, posicionCarro3Y
+		sub ax, 6
+		mov posicionCarrilesY, ax
+		;Creamos el diseño del carro 3
+		crearDiseno1 colorpixel,disenoCarro3,posicionCarro3X,posicionCarro3Y,posicionCarro3X_Temp,posicionCarro3Y_Temp,pagina,cicloDuracion,columna,fila
+		movimientoCarril OrientacionCarro3,posicionCarro3X,posicionCarro3Y,velocidadCarro3,posicionCarrilesX,posicionCarrilesY
+		limpiezaCarriles OrientacionCarro3,posicionCarrilesX,posicionCarrilesY,PosicionI3,posicionCarro3X,posicionCarro3Y,pagina
+
+		mov ax, OrientacionCarro4
+		mov posicionCarrilesX, ax
+		mov ax, posicionCarro4Y
+		sub ax, 6
+		mov posicionCarrilesY, ax
+		;Creamos el diseño del carro 4
+		crearDiseno1 colorpixel,disenoCarro4,posicionCarro4X,posicionCarro4Y,posicionCarro4X_Temp,posicionCarro4Y_Temp,pagina,cicloDuracion,columna,fila
+		movimientoCarril OrientacionCarro4,posicionCarro4X,posicionCarro4Y,velocidadCarro4,posicionCarrilesX,posicionCarrilesY
+		limpiezaCarriles OrientacionCarro4,posicionCarrilesX,posicionCarrilesY,PosicionI4,posicionCarro4X,posicionCarro4Y,pagina
+
+		mov ax, OrientacionCarro5
+		mov posicionCarrilesX, ax
+		mov ax, posicionCarro5Y
+		sub ax, 6
+		mov posicionCarrilesY, ax
+		;Creamos el diseño del carro 5
+		crearDiseno1 colorpixel,disenoCarro5,posicionCarro5X,posicionCarro5Y,posicionCarro5X_Temp,posicionCarro5Y_Temp,pagina,cicloDuracion,columna,fila
+		movimientoCarril OrientacionCarro5,posicionCarro5X,posicionCarro5Y,velocidadCarro5,posicionCarrilesX,posicionCarrilesY
+		limpiezaCarriles OrientacionCarro5,posicionCarrilesX,posicionCarrilesY,PosicionI5,posicionCarro5X,posicionCarro5Y,pagina
+		
+			mov ax, OrientacionCarro6
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro6Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 6
+			crearDiseno1 colorpixel,disenoCarro6,posicionCarro6X,posicionCarro6Y,posicionCarro6X_Temp,posicionCarro6Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro6,posicionCarro6X,posicionCarro6Y,velocidadCarro6,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro6,posicionCarrilesX,posicionCarrilesY,PosicionI6,posicionCarro6X,posicionCarro6Y,pagina
+
+			mov ax, OrientacionCarro7
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro7Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 7
+			crearDiseno1 colorpixel,disenoCarro7,posicionCarro7X,posicionCarro7Y,posicionCarro7X_Temp,posicionCarro7Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro7,posicionCarro7X,posicionCarro7Y,velocidadCarro7,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro7,posicionCarrilesX,posicionCarrilesY,PosicionI7,posicionCarro7X,posicionCarro7Y,pagina
+
+			mov ax, OrientacionCarro8
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro8Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 8
+			crearDiseno1 colorpixel,disenoCarro8,posicionCarro8X,posicionCarro8Y,posicionCarro8X_Temp,posicionCarro8Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro8,posicionCarro8X,posicionCarro8Y,velocidadCarro8,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro8,posicionCarrilesX,posicionCarrilesY,PosicionI8,posicionCarro8X,posicionCarro8Y,pagina
+			
+			mov ax, OrientacionCarro9
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro9Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 9
+			crearDiseno1 colorpixel,disenoCarro9,posicionCarro9X,posicionCarro9Y,posicionCarro9X_Temp,posicionCarro9Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro9,posicionCarro9X,posicionCarro9Y,velocidadCarro9,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro9,posicionCarrilesX,posicionCarrilesY,PosicionI9,posicionCarro9X,posicionCarro9Y,pagina
+
+			mov ax, OrientacionCarro10
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro10Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 10
+			crearDiseno1 colorpixel,disenoCarro10,posicionCarro10X,posicionCarro10Y,posicionCarro10X_Temp,posicionCarro10Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro10,posicionCarro10X,posicionCarro10Y,velocidadCarro10,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro10,posicionCarrilesX,posicionCarrilesY,PosicionI10,posicionCarro10X,posicionCarro10Y,pagina
+
+			mov ax, OrientacionCarro11
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro11Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 11
+			crearDiseno1 colorpixel,disenoCarro11,posicionCarro11X,posicionCarro11Y,posicionCarro11X_Temp,posicionCarro11Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro11,posicionCarro11X,posicionCarro11Y,velocidadCarro11,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro11,posicionCarrilesX,posicionCarrilesY,PosicionI11,posicionCarro11X,posicionCarro11Y,pagina
+
+			mov ax, OrientacionCarro12
+	        mov posicionCarrilesX, ax
+			mov ax, posicionCarro12Y
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			;Creamos el diseño del carro 12
+			crearDiseno1 colorpixel,disenoCarro12,posicionCarro12X,posicionCarro12Y,posicionCarro12X_Temp,posicionCarro12Y_Temp,pagina,cicloDuracion,columna,fila
+			movimientoCarril OrientacionCarro12,posicionCarro12X,posicionCarro12Y,velocidadCarro12,posicionCarrilesX,posicionCarrilesY
+			limpiezaCarriles OrientacionCarro12,posicionCarrilesX,posicionCarrilesY,PosicionI12,posicionCarro12X,posicionCarro12Y,pagina
+
+		;Volvemos a enciclar
+		jmp carro
+			;=============================== errores ===============================
 error0:
    	call limpiarEnColorNegro
 	mov columna, 6
@@ -1615,12 +2295,6 @@ error18:
    	delay 30
 	jmp MenuInicial
 ; ================================ procedimientos ===============================
-
-graficarPixel proc
-
-
-graficarPixel endp
-
 modoVideoIniciar proc
 	xor ax,ax
 	xor bx,bx
@@ -1686,6 +2360,222 @@ limpiarEnColorNegro proc
 
 limpiarEnColorNegro endp
 
+generarTablero proc
+		;Limpiamos los registros
+		xor ax,ax
+		xor bx,bx
+		xor cx,cx
+		xor dx,dx
+		mov posicionTableroX,0
+		mov posicionTableroY,8
+
+		;Ahora limpiamos la pantalla
+		;CALL limpiarEnColorNegro
+
+		jmp tablero1
+
+
+	tablero1:
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+
+			;Empezamos a graficar pagina 0
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionTableroY   ;DX coordenada en Y
+			mov cx, posicionTableroX   ;CX coordenada en X
+			mov bh, pagina             ;BH la pagina a imprimir
+			mov al, 7                  ;Color que queremos colocar
+			int 10h
+
+			;Empezamos a graficar pagina 1
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionTableroY   ;DX coordenada en Y
+			mov cx, posicionTableroX   ;CX coordenada en X
+			mov bh, 1                  ;BH la pagina a imprimir
+			mov al, 7                  ;Color que queremos colocar
+			int 10h
+
+			;Aumentamos la posicionTableroY
+			xor ax,ax
+			mov ax, posicionTableroY
+			add ax, 1
+			mov posicionTableroY, ax
+
+			;Mientras estemos dentro de < = a 192 imprimimos la fila
+			cmp posicionTableroY, 192
+			jbe tablero1          ;Si es menor o igual salta
+
+			;Como se sobre paso reiniciamos la posicionTableroY y aumentamos la posicion tablero X
+			xor ax,ax 
+			mov posicionTableroY, 8
+			mov ax, posicionTableroX
+			add ax, 1
+			mov posicionTableroX, ax
+
+			;Verificamos que hayamos terminado las columnas
+			;Mientras estemos dentro de < = a 320 seguimos analizando
+			cmp posicionTableroX, 320
+			jbe tablero1           ;Si es menor o igual salta
+
+			;Esperamos un caracter
+			;getChar
+
+			;Ahora limpiamos la pantalla
+			;CALL limpiarEnColorNegro
+
+			;jmp logicaVideo ;<---------------------Regresa al inicio de video
+
+			;Regresamos al inicio de video
+			jmp inicioCarriles1
+
+	inicioCarriles1:
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+			mov posicionCarrilesX, 0
+			mov posicionCarrilesY, 16
+
+			jmp Carriles1
+
+	Carriles1:
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+
+			;Empezamos a graficar
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionCarrilesY  ;DX coordenada en Y
+			mov cx, posicionCarrilesX  ;CX coordenada en X
+			mov bh, pagina             ;BH la pagina a imprimir
+			mov al, 8                  ;Color que queremos colocar
+			int 10h
+
+			;Empezamos a graficar pagina 1
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionTableroY   ;DX coordenada en Y
+			mov cx, posicionTableroX   ;CX coordenada en X
+			mov bh, 1                  ;BH la pagina a imprimir
+			mov al, 7                  ;Color que queremos colocar
+			int 10h
+
+			;Aumentamos la posicionCarrilesY
+			xor ax,ax
+			mov ax, posicionCarrilesY
+			add ax, 1
+			mov posicionCarrilesY, ax
+
+			;Mientras estemos dentro de < = a 184 imprimimos la fila
+			cmp posicionCarrilesY, 184
+			jbe Carriles1           ;Si es menor o igual salta
+
+			;Como se sobre paso reiniciamos la posicionCarrilesY y aumentamos la posicionCarrilesX
+			xor ax,ax 
+			mov posicionCarrilesY, 16
+			mov ax, posicionCarrilesX
+			add ax, 1
+			mov posicionCarrilesX, ax
+
+			;Verificamos que hayamos terminado las columnas
+			;Mientras estemos dentro de < = a 320 seguimos analizando
+			cmp posicionCarrilesX, 320
+			jbe Carriles1           ;Si es menor o igual salta
+
+			;Como termino de hacer el grafico mostramos la pagina hecha
+			;CALL cambiarPagina
+
+			;Esperamos un caracter
+			;getChar
+
+			;Ahora limpiamos la pantalla
+			;CALL limpiarEnColorNegro
+
+			;jmp logicaVideo
+
+			jmp inicioDivisionCarriles1
+
+	inicioDivisionCarriles1:
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx 
+			xor dx,dx
+			mov posicionDivisionCarrilesX, 0
+			mov posicionDivisionCarrilesY, 24
+			mov contadorPixelesSeparacion,0
+
+			jmp DivisionCarrilesCarriles1
+
+	DivisionCarrilesCarriles1:
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+
+			;Empezamos a graficar
+			mov ah, 0ch                			;Indicar que se imprimira un pixel
+			mov dx, posicionDivisionCarrilesY   ;DX coordenada en Y
+			mov cx, posicionDivisionCarrilesX   ;CX coordenada en X
+			mov bh, pagina             			;BH la pagina a imprimir
+			mov al, 15                  		;Color que queremos colocar
+			int 10h
+
+			;Aumentamos la contadorPixelesSeparacion
+			xor ax,ax
+			mov ax, contadorPixelesSeparacion
+			add ax, 1
+			mov contadorPixelesSeparacion, ax
+
+			;Aumentamos la posicionDivisionCarrilesX
+			xor ax,ax
+			mov ax, posicionDivisionCarrilesX
+			add ax, 1
+			mov posicionDivisionCarrilesX, ax
+
+			;Mientras estemos dentro de = a 10 imprimimos la fila
+			cmp contadorPixelesSeparacion, 10
+			je aumentoX1           ;Si es menor o igual salta
+
+			jmp DivisionCarrilesCarriles1
+
+
+	aumentoX1:
+			;Reiniciamos el contador
+			mov contadorPixelesSeparacion, 0
+
+			;Aumentamos la posicionDivisionCarrilesX
+			xor ax,ax
+			mov ax, posicionDivisionCarrilesX
+			add ax, 10
+			mov posicionDivisionCarrilesX, ax
+
+			;Vericamos que no hayamos llegado al borde
+			cmp posicionDivisionCarrilesX, 320
+			jbe DivisionCarrilesCarriles1           ;Si es menor o igual salta
+
+			;Llegamos al borde aumentamos Y
+			xor ax,ax 
+			mov ax, posicionDivisionCarrilesY
+			add ax, 8
+			mov posicionDivisionCarrilesY,ax
+
+			;Reiniciamos X
+			mov posicionDivisionCarrilesX, 0
+
+			;Vericamos que no hayamos llegado al borde
+			cmp posicionDivisionCarrilesY, 176
+			jbe DivisionCarrilesCarriles1           ;Si es menor o igual salta
+
+
+generarTablero endp
+
 modoVideoFinalizar proc
 	xor ax,ax
 	xor bx,bx
@@ -1748,6 +2638,7 @@ cambiarPagina proc
 		ret 
 
 cambiarPagina endp 
+
 
 
 

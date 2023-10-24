@@ -632,8 +632,8 @@ buscarlimite macro destino,contador
         mov di,0
 endm
 ; generar numero random de 0 a 7
-generarrandom macro letras
-    LOCAL fin
+generarrandom macro num
+    LOCAL fin,fin1,fin2,fin3
     
     ; Inicializar el generador de números aleatorios
     mov ah, 2ch
@@ -642,29 +642,39 @@ generarrandom macro letras
     int 21h
 
     ; Generar un número aleatorio entre 0 y 6
-    mov ah, 0
+    mov ah, 1
     mov al, DL
-    and al, 7
-    cmp al, 0
-    je fin
+    and al, 4
+    ;cmp al, 0
+    ;je fin
     cmp al, 1
     je fin
     cmp al, 2
     je fin
     cmp al, 3
     je fin
-    cmp al, 4
-    je fin
-    cmp al, 5   
-    je fin
-    cmp al, 6
-    je fin
+   
 
     fin:
-        ; Usar el número aleatorio como índice para seleccionar una letra
-        mov bx, offset letras
-        add bx, ax
-        mov al, [bx]
+       
+        cmp num,1
+        je fin1
+        xor ah,ah
+        mov num, ax      ; Mueve AX a num (en memoria)
+        jmp fin3
+
+    fin1:
+        cmp ax,1
+        je fin2
+        mov ax,0
+        mov num, ax       ; Mueve 0 a num (en memoria)
+        jmp fin3
+
+    fin2:
+        mov ax,320
+        mov num, ax     ; Mueve 320 a num (en memoria)
+
+    fin3:
  
 endm
 ;cerrar el programa
@@ -1209,3 +1219,1587 @@ prefijolect macro cadena,numero1,num1,num2,resul,test1,numero2,num3,num4,resul2,
     
     fin:
 endm   
+
+
+;Crear diseño carro 1
+
+;Crear diseño carro 1
+crearDiseno1 macro Color,diseno,posicionCarroX,posicionCarroY,posicionCarroX_Temp,posicionCarroY_Temp,pagina,cicloDuracion,columna,fila
+    LOCAL dibujo,d3filaIntermedi,d3filaIntermedi1,d3filaIntermedi2,d3filaIntermedi3,restardato,fila1,fila2,fila3,fila4,fila5,fila6,filaIntermedia,fin,filaIntermedia2,filaIntermedia3,d2f1,d2fila2,d2fila3,d2fila4,d2fila5,d2fila6,d2filaIntermedia,d2filaIntermedia2,d2filaIntermedia3,d3f1,d3fila2,d3fila3,d3fila4,d3fila5,d3fila6,d3filaIntermedia,d3filaIntermedia2,d3filaIntermedia3
+    xor ax,ax
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+
+
+    ;Extraemos la posicion iniciar a dibujar
+    mov ax, posicionCarroX
+    mov bx, posicionCarroY
+    mov cx, 3 ;Limite de ruedas
+
+    ;Va a iniciar a dibujar en la posicionCarroX y posicionCarroY
+    dibujo:
+            ;Por si necesito colocar valores extra
+            ;cmp Orientacion,0
+            ;jne restardato
+            cmp diseno,2
+            je d2f1
+            cmp diseno,3
+            je d3f1
+
+            jmp fila1
+    restardato:
+            ;Extraemos valores de nuevo
+            sub posicionCarroX,8
+            mov ax, posicionCarroX
+            jmp fila1
+
+    fila1:
+            mov Color,0
+            ;Primer pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,5
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Continuamos a la fila2
+            jmp fila2
+            
+
+    fila2:  
+        ;Es lo mismo de arriba pero desplazamos el y a una posicion anterior
+            ;Primer pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,5
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+           
+            
+
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,2
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,13
+            
+            ;Saltamos a la proxima fila
+            jmp fila3
+    fila3:
+            mov Color,10
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je filaIntermedia
+
+            ;Si no se cumple que siga iterando
+            jmp fila3
+
+    filaIntermedia:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,3
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,13
+            
+            ;Saltamos a la proxima fila
+            jmp fila4
+            
+
+    fila4:  ;Ejecutamos parecido a fila 3 solo que una posicion menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je filaIntermedia2
+
+            ;Si no se cumple que siga iterando
+            jmp fila4
+                  
+    filaIntermedia2:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Le agregamos 2 para que se desplaze 2 posiciones a la derecha y poder dibujar el techo
+            add ax, 2
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,4
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,6
+            
+            ;Saltamos a la proxima fila
+            jmp fila5
+
+
+    fila5:  ;Ejecutamos parecido a fila 4 para el techo solo que dos posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je filaIntermedia3
+
+            ;Si no se cumple que siga iterando
+            jmp fila5
+    
+    filaIntermedia3:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Le agregamos 2 para que se desplaze 2 posiciones a la derecha y poder dibujar el techo
+            add ax, 2
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,5
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,6
+            
+            ;Saltamos a la proxima fila
+            jmp fila6
+
+
+    fila6:  ;Ejecutamos parecido a fila 5 para el techo solo que una posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je fin
+
+            ;Si no se cumple que siga iterando
+            jmp fila6
+
+
+    d2f1:
+            mov Color,0
+            ;Primer pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,5
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Continuamos a la fila2
+            jmp d2fila2
+            
+
+    d2fila2:  
+        ;Es lo mismo de arriba pero desplazamos el y a una posicion anterior
+            ;Primer pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,5
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+           
+            
+
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,2
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,13
+            
+            ;Saltamos a la proxima fila
+            jmp d2fila3
+    d2fila3:
+            mov Color,11
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d2filaIntermedia
+
+            ;Si no se cumple que siga iterando
+            jmp d2fila3
+
+    d2filaIntermedia:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,3
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,13
+            
+            ;Saltamos a la proxima fila
+            jmp d2fila4
+            
+
+    d2fila4:  ;Ejecutamos parecido a fila 3 solo que una posicion menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d2filaIntermedia2
+
+            ;Si no se cumple que siga iterando
+            jmp d2fila4
+                  
+    d2filaIntermedia2:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,4
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,10
+            
+            ;Saltamos a la proxima fila
+            jmp d2fila5
+            
+
+    d2fila5:  ;Ejecutamos parecido a fila 4 para el techo solo que dos posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d2filaIntermedia3
+
+            ;Si no se cumple que siga iterando
+            jmp d2fila5
+    
+    d2filaIntermedia3:
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,5
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,10
+            
+            ;Saltamos a la proxima fila
+            jmp d2fila6
+
+
+    d2fila6:  ;Ejecutamos parecido a fila 5 para el techo solo que una posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je fin
+
+            ;Si no se cumple que siga iterando
+            jmp d2fila6
+
+    d3f1:
+            mov Color,0
+            ;Primer pixel rueda
+            add ax,2
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+        
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,13
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,14
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,15
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+            ;Continuamos a la fila2
+            jmp d3fila2
+            
+
+    d3fila2:  
+        ;Es lo mismo de arriba pero desplazamos el y a una posicion anterior
+            ;Primer pixel rueda
+            add ax,2
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Segundo pixel rueda
+            add ax,3
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Tercer pixel rueda
+            add ax,4
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,8
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,9
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,10
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+             ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,13
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+              ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,14
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+              ;Extraemos valores de nuevo
+            mov ax, posicionCarroX
+            mov bx, posicionCarroY
+
+            ;Cuarto pixel rueda
+            add ax,15
+            mov posicionCarroX_Temp,ax
+            sub bx,1
+            mov posicionCarroY_Temp,bx
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            
+
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,2
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,12
+            
+            ;Saltamos a la proxima fila
+            jmp d3fila3
+    d3fila3:
+            mov Color,15
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d3filaIntermedi
+
+            ;Si no se cumple que siga iterando
+            jmp d3fila3
+    d3filaIntermedi:
+        mov Color,12
+        mov cicloDuracion,7
+        jmp d3filaIntermedia
+    d3filaIntermedia:
+            
+            
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            jne d3filaIntermedia
+            mov Color,15
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            ;Restamos uno para que inicie justo donde se necesita
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,3
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del carro a cx
+            mov cicloDuracion,12
+            
+            ;Saltamos a la proxima fila
+            jmp d3fila4
+            
+
+    d3fila4:  ;Ejecutamos parecido a fila 3 solo que una posicion menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d3filaIntermedi1
+
+            ;Si no se cumple que siga iterando
+            jmp d3fila4
+    d3filaIntermedi1:
+        mov Color,12
+        mov cicloDuracion,7
+        jmp d3filaIntermedia2              
+    d3filaIntermedia2:
+            
+            
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            jne d3filaIntermedia2
+            mov Color,15
+
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,4
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,12
+            
+            ;Saltamos a la proxima fila
+            jmp d3fila5
+
+
+    d3fila5:  ;Ejecutamos parecido a fila 4 para el techo solo que dos posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d3filaIntermedi2
+
+            ;Si no se cumple que siga iterando
+            jmp d3fila5
+    d3filaIntermedi2:
+        mov Color,12
+        mov cicloDuracion,5
+        jmp d3filaIntermedia3              
+    d3filaIntermedia3:
+            
+            
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            jne d3filaIntermedia3
+            mov Color,15
+            ;Extraemos los valores originales
+            mov ax, posicionCarroX
+            
+            sub ax, 1
+
+            ;Lo guardamos en los temporales
+            mov posicionCarroX_Temp,ax
+            mov bx, posicionCarroY
+            sub bx,5
+            mov posicionCarroY_Temp,bx
+
+            ;Agregamos el largo del techo
+            mov cicloDuracion,12
+            
+            ;Saltamos a la proxima fila
+            jmp d3fila6
+
+
+    d3fila6:  ;Ejecutamos parecido a fila 5 para el techo solo que una posiciones menos en y
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+
+            ;Restamos 1 al ciclo
+            mov ax, cicloDuracion
+            sub ax, 1
+            mov cicloDuracion,ax
+
+            ;Extraemos el valor a comparar
+            mov cx, cicloDuracion
+
+            ;Hasta que se cumpla el largo sigue iterando
+            cmp cx,0
+            je d3filaIntermedi3
+
+            ;Si no se cumple que siga iterando
+            jmp d3fila6
+
+    d3filaIntermedi3:
+            mov Color,12
+            ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina 
+             ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+             ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+             ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+             ;Extraemos valores de nuevo
+            mov ax, posicionCarroX_Temp
+            mov bx, posicionCarroY_Temp
+
+            ;Se dibuja la carroceria
+            add ax,1
+            mov posicionCarroX_Temp,ax
+            mov posicionCarroY_Temp,bx
+
+            ;Interrupcion
+            ;interrunpirCarro
+
+            ;Dibujamos
+            graficarPixel Color,posicionCarroX_Temp,posicionCarroY_Temp,pagina
+            jmp fin
+
+
+    fin: 
+        
+        ;Interrupcion para realizar distintas acciones
+        interrunpirCarro pagina,columna,fila
+
+    
+	
+
+endm
+
+graficarPixel macro colorpix,pixelX,pixelY,pagina
+            xor ax,ax
+            xor bx,bx
+            xor cx,cx
+            xor dx,dx
+
+            ;Empezamos a graficar
+			mov ah, 0ch              ;Indicar que se imprimira un pixel
+			mov dx, pixelY           ;DX coordenada en Y
+			mov cx, pixelX           ;CX coordenada en X
+			mov bh, pagina           ;BH la pagina a imprimir
+			mov al, colorpix               ;Color que queremos colocar
+			int 10h
+endm
+
+interrunpirCarro macro pagina,columna,fila
+    LOCAL input_loop,fin
+
+           
+		
+            ;Colocamos el cursor donde no se mire
+            mov fila,50
+            mov columna,50
+            
+            CALL colocarCursor
+           
+            ;Aqui podemos hacer validaciones extra
+
+            ;Primero validamos si se presiono algo
+            mov ah,1  ;se guarda en al en código hexadecimal del caracter leído 
+            int 16h
+
+            ;Si no se presiono que siga
+            jz fin
+
+            ;Si se presiono interrumpimos
+            mov ah, 0
+            int 16h
+
+            ;1,2,3,4,5 para salir
+			cmp al,48
+			je menus
+			cmp al,49
+			je menus
+			cmp al,50
+			je menus
+			cmp al,51
+			je menus
+			cmp al,52
+			je menus
+
+    fin:
+
+endm
+
+
+limpiezaCarriles macro orientacion,posicionCarrilesX,posicionCarrilesY,inicialY,posicionCarroXA,posicionCarroYA,pagina
+	LOCAL inicializar0,limpieza,inicio, limpieza1,fin 
+    ;Limpiamos por donde pasa el carro generando de nuevo el carril
+    ;Limpiamos los registros
+    xor ax,ax
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+    ;Posicion donde inicia a limpiar los carriles
+    inicio:
+    
+        mov ax, orientacion     
+        mov posicionCarrilesX, ax
+        xor ax,ax
+        mov ax, posicionCarroYA
+        add ax, 1
+        mov posicionCarrilesY, ax
+
+        cmp orientacion,0
+        je inicializar0
+
+        ;Comparamos el movimiento
+        cmp posicionCarroXA, 0
+        jne limpieza1
+
+        ;Desplazamos la coordenada de x + 1, para que dibuje justo en la proxima coordenada 
+        mov posicionCarroXA, 320
+        mov ax,inicialY
+        mov posicionCarroYA,ax
+        jmp limpieza1
+
+    inicializar0:
+        
+        ;Comparamos el movimiento
+        cmp posicionCarroXA, 310
+        jbe limpieza
+
+        ;Desplazamos la coordenada de x + 1, para que dibuje justo en la proxima coordenada
+        mov posicionCarroXA,0
+        mov ax,inicialY
+        mov posicionCarroYA,ax
+        jmp limpieza
+
+    limpieza:
+	        ;Limpiamos por donde pasa el carro generando de nuevo el carril
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+			;Posicion donde inicia a limpiar los carriles
+	        
+			
+			;Empezamos a graficar
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionCarrilesY  ;DX coordenada en Y
+			mov cx, posicionCarrilesX  ;CX coordenada en X
+			mov bh, pagina             ;BH la pagina a imprimir
+			mov al, 8                  ;Color que queremos colocar
+			int 10h
+
+            ;Aumentamos la posicionCarrilesY
+			xor ax,ax
+			mov ax, posicionCarrilesY
+			add ax, 1
+			mov posicionCarrilesY, ax
+
+            ;Comparamos el maximo de la fila
+			mov ax, posicionCarroYA
+			add ax, 1
+
+            ;Mientras estemos dentro de < = a 7 imprimimos la fila, es el tamaño del carril
+			cmp posicionCarrilesY, ax
+			jb limpieza            ;Si es menor o igual salta
+
+			;Como se sobre paso reiniciamos la posicionCarrilesY y aumentamos la posicionCarrilesX
+			xor ax,ax 
+			mov ax, posicionCarroYA
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			mov ax, posicionCarrilesX
+			add ax, 1
+			mov posicionCarrilesX, ax
+
+			;Verificamos que hayamos terminado las columnas
+			;Mientras estemos dentro de < = a 320 seguimos analizando
+			cmp posicionCarrilesX, 320
+			jbe limpieza          ;Si es menor o igual salta
+
+            jmp fin
+    limpieza1:
+	        ;Limpiamos por donde pasa el carro generando de nuevo el carril
+			;Limpiamos los registros
+			xor ax,ax
+			xor bx,bx
+			xor cx,cx
+			xor dx,dx
+			;Posicion donde inicia a limpiar los carriles
+	        
+			
+			;Empezamos a graficar
+			mov ah, 0ch                ;Indicar que se imprimira un pixel
+			mov dx, posicionCarrilesY  ;DX coordenada en Y
+			mov cx, posicionCarrilesX  ;CX coordenada en X
+			mov bh, pagina             ;BH la pagina a imprimir
+			mov al, 8                  ;Color que queremos colocar
+			int 10h
+
+            ;Aumentamos la posicionCarrilesY
+			xor ax,ax
+			mov ax, posicionCarrilesY
+			add ax, 1
+			mov posicionCarrilesY, ax
+
+            ;Comparamos el maximo de la fila
+			mov ax, posicionCarroYA
+			add ax, 1
+
+            ;Mientras estemos dentro de < = a 7 imprimimos la fila, es el tamaño del carril
+			cmp posicionCarrilesY, ax
+			jb limpieza1            ;Si es menor o igual salta
+
+			;Como se sobre paso reiniciamos la posicionCarrilesY y aumentamos la posicionCarrilesX
+			xor ax,ax 
+			mov ax, posicionCarroYA
+			sub ax, 6
+			mov posicionCarrilesY, ax
+			mov ax, posicionCarrilesX
+			sub ax, 1
+			mov posicionCarrilesX, ax
+
+			;Verificamos que hayamos terminado las columnas
+			;Mientras estemos dentro de > = a 0 seguimos analizando
+			cmp posicionCarrilesX, 0
+			jne limpieza1          ;Si es menor o igual salta
+
+            jmp fin
+    fin:
+          
+endm
+
+movimientoCarril macro Orientacion,Carrox,Carroy,Velocidad,CarrilesX,CarrilesY
+    LOCAL sentido1,sentido2,inicio,fin
+    ;limpiar registros
+    xor ax,ax
+    xor bx,bx
+
+    inicio:
+        cmp Orientacion,0
+        je sentido1
+        cmp Orientacion,0
+        jne sentido2
+    
+    sentido1:
+
+        ;Desplazamos la coordenada de x + 1, para que dibuje justo en la proxima coordenada
+        mov bx, Carrox
+        add bx, Velocidad
+        mov Carrox,bx
+
+        ;Posicion donde inicia a limpiar los carriles
+        mov ax,Orientacion
+        mov CarrilesX, ax
+        mov ax, Carroy
+        add ax, Velocidad
+        mov CarrilesY, ax
+    
+        jmp fin
+    
+    sentido2:
+        ;Desplazamos la coordenada de x + 1, para que dibuje justo en la proxima coordenada
+        mov bx, Carrox
+        sub bx, Velocidad
+        mov Carrox,bx
+
+        ;Posicion donde inicia a limpiar los carriles
+        mov ax,Orientacion
+        mov CarrilesX, ax
+        mov ax, Carroy
+        sub ax, Velocidad
+        mov CarrilesY, ax
+
+        jmp fin
+    
+    fin:
+
+endm
